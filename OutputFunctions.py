@@ -1,11 +1,12 @@
 import pyvjoy
+import pynput
 import time
 
 
 def steer(steering=0):  # -16384 = links  0 = mitte 16384 = rechts
     print("Steer")
     print(steering)
-    # steering += 16384
+    steering += 16384
     j.set_axis(pyvjoy.HID_USAGE_X, steering)
     return steering
 
@@ -98,14 +99,76 @@ def reset():
     j.update()
     return 0
 
+def exitbox(track='ks_zandvoort',car='ks_bmw_m235i_racing'):
+    if track == 'ks_zandvoort':
+        if car == 'ks_bmw_m235i_racing':
+            c=32768
+            steer(0)
+            usepedals(c,0,4000)
+            shift(1)
+            time.sleep(5)
+            while c > 0:
+                c -= 30
+                usepedals(c, 0, 4000)
+                time.sleep(0.0005)
+            time.sleep(0.5)
+            x=0
+            while x > -3500:
+                x -= 10
+                steer(x)
+                time.sleep(0.0005)
+            time.sleep(1)
+
+            while x < 1:
+                x += 10
+                steer(x)
+                time.sleep(0.0005)
+            time.sleep(2.2)
+
+            while x < 3500:
+                x += 10
+                steer(x)
+                time.sleep(0.0005)
+            time.sleep(0.57)
+
+            while x > -1:
+                x -= 10
+                steer(x)
+                time.sleep(0.0005)
+
+    return 0
+
+def kill(way='restart'):
+    if way == 'restart':
+        k.press(pynput.keyboard.Key.ctrl_l)
+        k.press('n')
+        time.sleep(0.02)
+        k.release('n')
+        k.release(pynput.keyboard.Key.ctrl_l)
+        time.sleep(3)
+        exitboxmenu()
+    elif way == 'box':
+        k.press(pynput.keyboard.Key.ctrl_l)
+        k.press('b')
+        time.sleep(0.02)
+        k.release('b')
+        k.release(pynput.keyboard.Key.ctrl_l)
+        time.sleep(3)
+        exitbox()
+    return 0
+
+def exitboxmenu():
+    m.position = (50, 170)
+    m.press(pynput.mouse.Button.left)
+    time.sleep(0.02)
+    m.release(pynput.mouse.Button.left)
+    return 0
+
 
 j = pyvjoy.VJoyDevice(1)
+k = pynput.keyboard.Controller()
+m = pynput.mouse.Controller()
 
 j.reset()
 j.update()
-if __name__ == '__main__':
-    # 5 sec countdown
-    for i in list(range(2))[::-1]:
-        print(i + 1)
-        time.sleep(1)
-    steer(16000)
+steer(0)

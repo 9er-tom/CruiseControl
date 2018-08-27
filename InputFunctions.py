@@ -1,7 +1,7 @@
 import os
 import sys
 import platform
-import numpy as np
+import numpy
 from sim_info import info
 import time
 
@@ -25,7 +25,8 @@ os.environ['PATH'] = os.environ['PATH'] + ";."
 
 
 def get_info():
-    return np.array([[info.physics.gear, info.physics.rpms],
+    return numpy.array([info.physics.gear,
+                     info.physics.rpms,
                      info.physics.speedKmh,
                      info.physics.wheelSlip,
                      info.physics.wheelLoad,
@@ -33,6 +34,7 @@ def get_info():
                      info.physics.kersCharge,
                      info.physics.numberOfTyresOut,
                      info.physics.tyreDirtyLevel,
+                     info.graphics.carCoordinates,
                      info.graphics.normalizedCarPosition,
                      info.graphics.iCurrentTime,
                      info.graphics.iLastTime,
@@ -56,6 +58,15 @@ def get_info():
     # a = a + (getsessionInfo(),)
     # return a
 
+def checkOnTrack():
+    onTrack=1 #assuming car is on track and trying to disprove that
+    if info.physics.numberOfTyresOut > 0:
+        onTrack=0
+    if numpy.sum(info.physics.tyreDirtyLevel) > 0.05:
+        onTrack = 0
+    if numpy.sum(info.physics.carDamage) > 0.05:
+        onTrack = 0
+    return onTrack
 
 if __name__ == '__main__':
 
