@@ -18,10 +18,9 @@ def evaluate_genomes(genomes, config):
         net = neat.nn.FeedForwardNetwork.create(genome, config)  # create feed forward network
 
         control.drive_loop(net)
-        # output = np.asarray(  # converts output to numpy array
-        #     net.activate([get_info()[10]]))  # start neural network with given input (track progress)
-
         genome.fitness = set_fitness()  # fitness function
+
+        # todo reset car
 
 
 def set_fitness():
