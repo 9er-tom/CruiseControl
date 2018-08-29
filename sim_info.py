@@ -29,7 +29,6 @@ import functools
 import ctypes
 from ctypes import c_int32, c_float, c_wchar
 
-
 AC_STATUS = c_int32
 AC_OFF = 0
 AC_REPLAY = 1
@@ -172,6 +171,7 @@ class SimInfo:
 
     def __del__(self):
         self.close()
+
 
 info = SimInfo()
 

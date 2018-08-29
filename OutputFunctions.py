@@ -40,14 +40,6 @@ def usepedals(clutch=0, brake=0, throttle=0):
     return 0
 
 
-def set_throttle(i):
-    j.set_axis(pyvjoy.HID_USAGE_Y, i)
-
-
-def set_break(i):
-    j.set_axis(pyvjoy.HID_USAGE_RX, i)
-
-
 def manageBoost(addsub):  # 1 = +  2 = -
     if addsub == 1:
         j.set_button(15, 1)
@@ -99,12 +91,13 @@ def reset():
     j.update()
     return 0
 
-def exitbox(track='ks_zandvoort',car='ks_bmw_m235i_racing'):
+
+def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'):
     if track == 'ks_zandvoort':
         if car == 'ks_bmw_m235i_racing':
-            c=32768
+            c = 32768
             steer(0)
-            usepedals(c,0,4000)
+            usepedals(c, 0, 4000)
             shift(1)
             time.sleep(5)
             while c > 0:
@@ -112,7 +105,7 @@ def exitbox(track='ks_zandvoort',car='ks_bmw_m235i_racing'):
                 usepedals(c, 0, 4000)
                 time.sleep(0.0005)
             time.sleep(0.5)
-            x=0
+            x = 0
             while x > -3500:
                 x -= 10
                 steer(x)
@@ -138,6 +131,7 @@ def exitbox(track='ks_zandvoort',car='ks_bmw_m235i_racing'):
 
     return 0
 
+
 def kill(way='restart'):
     if way == 'restart':
         k.press(pynput.keyboard.Key.ctrl_l)
@@ -156,6 +150,7 @@ def kill(way='restart'):
         time.sleep(3)
         exitbox()
     return 0
+
 
 def exitboxmenu():
     m.position = (50, 170)

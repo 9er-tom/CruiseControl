@@ -60,20 +60,20 @@ def steertest():
     return 0
 
 
-#for i in list(range(4))[::-1]:
+# for i in list(range(4))[::-1]:
 #    print(i + 1)
 #    time.sleep(1)
 
-#steertest()
+# steertest()
 # inputtest(2000000)
-#while 1:
-   # print(InputFunctions.checkOnTrack())
+# while 1:
+# print(InputFunctions.checkOnTrack())
 
-#OutputFunctions.reset()
-#OutputFunctions.exitbox()
-time.sleep(5)
+# OutputFunctions.reset()
+# OutputFunctions.exitbox()
+time.sleep(2)
 OutputFunctions.kill()
 time.sleep(5)
 OutputFunctions.kill('box')
 time.sleep(10)
-#OutputFunctions.reset()
+# OutputFunctions.reset()
