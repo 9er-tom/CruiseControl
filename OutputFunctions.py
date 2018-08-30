@@ -3,13 +3,16 @@ import pynput
 import time
 
 
-def steer(steering=0):  # -16384 = links  0 = mitte 16384 = rechts
+'''def steer(steering=0):  # -16384 = links  0 = mitte 16384 = rechts
     print("Steer")
     print(steering)
     steering += 16384
     j.set_axis(pyvjoy.HID_USAGE_X, steering)
-    return steering
+    return steering'''
 
+def steer(steering=0.5):  # 0 = links  0.5 = mitte 1 = rechts
+    j.set_axis(pyvjoy.HID_USAGE_X, steering*32768)
+    return steering
 
 def shift(gear=0):  # 0 = Neutral#
     j.set_button(1, 0)
@@ -33,10 +36,10 @@ def shift(gear=0):  # 0 = Neutral#
     return gear
 
 
-def usepedals(clutch=0, brake=0, throttle=0):
-    j.set_axis(pyvjoy.HID_USAGE_Y, throttle)
-    j.set_axis(pyvjoy.HID_USAGE_RX, brake)
-    j.set_axis(pyvjoy.HID_USAGE_RY, clutch)
+def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
+    j.set_axis(pyvjoy.HID_USAGE_Y, throttle*32768)
+    j.set_axis(pyvjoy.HID_USAGE_RX, brake*32768)
+    j.set_axis(pyvjoy.HID_USAGE_RY, clutch*32768)
     return 0
 
 
@@ -92,17 +95,17 @@ def reset():
     return 0
 
 
-def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'):
+def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'): #teilweise noch nach altem prinzip
     if track == 'ks_zandvoort':
         if car == 'ks_bmw_m235i_racing':
-            c = 32768
+            c = 1
             steer(0)
-            usepedals(c, 0, 4000)
+            usepedals(c, 0, 0.1220703125)
             shift(1)
             time.sleep(5)
             while c > 0:
-                c -= 30
-                usepedals(c, 0, 4000)
+                c -= 0.0001
+                usepedals(c, 0, 0.1220703125)
                 time.sleep(0.0005)
             time.sleep(0.5)
             x = 0
