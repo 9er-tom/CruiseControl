@@ -5,6 +5,7 @@ import numpy
 from sim_info import info
 import time
 
+timestamp = 0
 cnt_enabled = False  # countdown
 flyingstart = 1
 timewaiting = 0
@@ -29,8 +30,8 @@ os.environ['PATH'] = os.environ['PATH'] + ";."
 def get_info():
     position = info.graphics.normalizedCarPosition
     global flyingstart
-    print(flyingstart)  # testing purposes
-    if flyingstart > 0 and 0 < position < 10:
+    # print(flyingstart)  # testing purposes
+    if flyingstart > 0 and 0 < position < 0.1:
         flyingstart = 0
     return numpy.array([info.physics.gear,
                         info.physics.rpms,
@@ -45,7 +46,7 @@ def get_info():
                         info.graphics.iCurrentTime,
                         info.graphics.iLastTime,
                         info.graphics.iBestTime,
-                        info.graphics.numberOfLaps - flyingstart,
+                        info.graphics.numberOfLaps + 1 - flyingstart,
                         info.static.carModel,
                         info.static.track], dtype=object)
 
@@ -54,24 +55,19 @@ def checkOnTrack():
     global timewaiting
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
-    if(info.physics.speedKmh != 0):
-        timewaiting = time.time_ns()
+    if info.physics.speedKmh > 0.1:
+        timewaiting = time.time()
+        # print(time.time() - timewaiting)
     return (info.physics.numberOfTyresOut <= 0
             and numpy.sum(info.physics.tyreDirtyLevel) <= 0.05
             and numpy.sum(info.physics.carDamage) <= 0.05
             and info.graphics.isInPit <= 0
-            and time.time_ns() - timewaiting <= 5000)
+            and time.time() - timewaiting <= 3)
 
-    # onTrack = 1  # assuming car is on track and trying to disprove that
-    # if info.physics.numberOfTyresOut > 0:
-    #     onTrack = 0
-    # if numpy.sum(info.physics.tyreDirtyLevel) > 0.05:
-    #     onTrack = 0
-    # if numpy.sum(info.physics.carDamage) > 0.05:
-    #     onTrack = 0
-    # if info.graphics.isInPit > 0:
-    #     onTrack = 0
-    # return onTrack
+
+def reset_time():
+    global timewaiting
+    timewaiting = time.time()
 
 
 def resetflyinglap():
@@ -87,5 +83,5 @@ if __name__ == '__main__':
             print(i + 1)
             time.sleep(1)
     while True:  # displays track info every 0.5 seconds
-        time.sleep(0.5)
+        time.sleep(1)
         print(get_info())
