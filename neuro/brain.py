@@ -1,5 +1,6 @@
 import neuro.controller as control
 from InputFunctions import get_info
+from OutputFunctions import kill
 import numpy as np
 import neuro.visualize as vis
 import neat
@@ -17,15 +18,15 @@ def evaluate_genomes(genomes, config):
         # create network
         net = neat.nn.FeedForwardNetwork.create(genome, config)  # create feed forward network
 
-        control.drive_loop(net)
-        genome.fitness = set_fitness()  # fitness function
+        control.drive_loop(net)  # starts driving loop
+        kill('box')  # resets car to box after driving loop is finished
 
-        # todo reset car
+        genome.fitness = set_fitness()  # fitness function
 
 
 def set_fitness():
-    # todo crazy calculations
-    return get_info()[10]  # returns track progress
+    return get_info()[9] + get_info()[13]
+    # return get_info()[10]  # returns track progress
 
 
 def run(config_file):

@@ -167,3 +167,8 @@ m = pynput.mouse.Controller()
 j.reset()
 j.update()
 steer(0)
+
+if __name__ == '__main__':
+    time.sleep(2)
+    kill()
+    j.reset()
