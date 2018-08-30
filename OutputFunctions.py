@@ -7,7 +7,7 @@ import time
     print("Steer")
     print(steering)
     steering += 16384
-    j.set_axis(pyvjoy.HID_USAGE_X, steering)
+    j.set_axis(pyvjoy.HID_USAGE_X, steering) ok
     return steering'''
 
 def steer(steering=0.5):  # 0 = links  0.5 = mitte 1 = rechts

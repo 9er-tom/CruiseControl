@@ -7,6 +7,7 @@ import time
 
 cnt_enabled = False  # countdown
 flyingstart = 1
+timewaiting = 0
 
 if platform.architecture()[0] == "64bit":
     sysdir = "stdlib64"
@@ -50,12 +51,16 @@ def get_info():
 
 
 def checkOnTrack():
+    global timewaiting
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
+    if(info.physics.speedKmh != 0):
+        timewaiting = time.time_ns()
     return (info.physics.numberOfTyresOut <= 0
             and numpy.sum(info.physics.tyreDirtyLevel) <= 0.05
             and numpy.sum(info.physics.carDamage) <= 0.05
-            and info.graphics.isInPit <= 0)
+            and info.graphics.isInPit <= 0
+            and time.time_ns() - timewaiting <= 5000)
 
     # onTrack = 1  # assuming car is on track and trying to disprove that
     # if info.physics.numberOfTyresOut > 0:
