@@ -64,7 +64,6 @@ def checkOnTrack():
             and info.graphics.isInPit <= 0
             and time.time() - timewaiting <= 3)
 
-
 def reset_time():
     global timewaiting
     timewaiting = time.time()
