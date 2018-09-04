@@ -55,7 +55,7 @@ def checkOnTrack():
     global timewaiting
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
-    if info.physics.speedKmh > 0.1:
+    if info.physics.speedKmh > 2:
         timewaiting = time.time()
         # print(time.time() - timewaiting)
     return (info.physics.numberOfTyresOut <= 0

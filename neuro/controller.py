@@ -4,18 +4,12 @@ from InputFunctions import checkOnTrack, get_info
 import neat
 import time
 
-car_controls = {  # dictionary for car controls
-    # in per cent
-    # throttle
-
-}
-
 
 def control_car(nn_output):
     """evaluates output node with highest confidence and controls car"""
     nn_output = np.asarray(nn_output)
     index = np.argmax(nn_output)  # gets index of highest value
-    print(index, '\n', nn_output, '\n')
+    # print(index, '\n', nn_output, '\n')
 
     # throttle
     if index == 0:

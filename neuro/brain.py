@@ -1,22 +1,19 @@
 import neuro.controller as control
 from InputFunctions import get_info, resetflyinglap, reset_time
 from OutputFunctions import kill
+from decimal import Decimal
 import neuro.visualize as vis
 import neat
 import os
 import time
 import datetime
 
-cnt_enabled = True  # countdown
-CHECKPOINT_PREFIX = 'neat-checkpoint-'  # prefix of checkpoint files
+countdown_enabled = True
 
-# ------- checkpoint parameters ------- #
+# ----- Checkpoint parameters  ----- #
+CHECKPOINT_PREFIX = 'cp-'  # prefix of checkpoint files
 checkpoint_interval = 10  # numbers of generation after which a checkpoint is saved
-load_checkpoint = False  # if this is true the most current checkpoint is loaded
-load_specific_checkpoint = False  # if this is True...
-specific_checkpoint = 'training-31-8-18/neat-checkpoint-129'  # ... this specific checkpoint is loaded
-
-dir_name = datetime.datetime.today().strftime('%Y-%m-%d')  # format of checkpoint directory name
+dir_name = 'training-' + datetime.datetime.today().strftime('%Y-%m-%d_%Hh-%Mm-%Ss')  # checkpoint directory name
 
 
 def evaluate_genomes(genomes, config):
@@ -29,11 +26,13 @@ def evaluate_genomes(genomes, config):
         resetflyinglap()  # resets flying start counter
         reset_time()
         control.drive_loop(net)  # starts driving loop
-        kill()  # resets car
 
-        genome.fitness = set_fitness()  # fitness function TODO update fitness every tick
+        genome.fitness = -1 if set_fitness() == 0 else set_fitness()  # fitness function
+
+        # genome.fitness = set_fitness()
         print('Fitness: ', genome.fitness, '\n')
 
+        kill()  # resets car
         # vis.draw_net(config, genome, True)
 
 
@@ -41,43 +40,29 @@ def set_fitness():
     """fitness function
     returns fitness for current organism"""
     # current lap (0 if flying start) + track progress - reset position (differs for each track)
-    return get_info()[9] + get_info()[13] - 0.81
+    return round(get_info()[9] + get_info()[13] - 0.81, 2)
 
 
 def check_checkpoint(config):
-    """Checks directory for neat-checkpoints.
-    Returns the population of the latest checkpoints or creates a new one of no checkpoint is found"""
-    checkpoint_list = []  # list containing checkpoint files
-
-    for string in os.listdir('.'):  # for every file in directory TODO search for most current directory
-        if CHECKPOINT_PREFIX in string:  # if file name contains specified prefix
-            checkpoint_list.append(  # identifying number of checkpoint gets added to list
-                int(string[string.rfind('-') + 1:]))  # searches for last occuring dash (-) and gets following digits
-    if not checkpoint_list:  # checks if list is empty in ultra pythonic way (if a list is empty it returns false)
-        print("No checkpoint found, starting anew...")
+    """Returns the population of the specified checkpoint or creates a new one if no name is specified is found.
+    If given name cannot be found, exception is thrown"""
+    checkpoint_name = input('Path to checkpoint to load (none if blank): ')
+    if len(checkpoint_name) != 0:  # loads specified checkpoint population
+        print('Loading checkpoint...')
+        return neat.Checkpointer.restore_checkpoint(checkpoint_name)
+    else:  # creates new population
         return neat.Population(config)
-
-    checkpoint_number = str(max(checkpoint_list))  # get highest identifying number of checkpoint files
-    print("Loading checkpoint ", checkpoint_number)
-    return neat.Checkpointer.restore_checkpoint(
-        CHECKPOINT_PREFIX + checkpoint_number)  # loads checkpoint file with highest number
 
 
 def run(config_file):
     """starts neural network"""
+    global dir_name
     # Load configuration.
     config = neat.Config(neat.DefaultGenome, neat.DefaultReproduction,
                          neat.DefaultSpeciesSet, neat.DefaultStagnation,
                          config_file)
 
-    # Create the population, which is the top-level object for a NEAT run.
-    if load_checkpoint:  # loads population from checkpoint if flag is set
-        if load_specific_checkpoint:  # if flag is set, specific checkpoint is loaded
-            p = neat.Checkpointer.restore_checkpoint(specific_checkpoint)
-        else:  # otherwise most recent checkpoint is loaded
-            p = check_checkpoint(config)
-    else:  # create new population if checkpoint is not loaded
-        p = neat.Population(config)
+    p = check_checkpoint(config)  # create or load population
 
     # Add a stdout reporter to show progress in the terminal.
     p.add_reporter(neat.StdOutReporter(True))
@@ -86,12 +71,19 @@ def run(config_file):
 
     # creates checkpoint after set number of generations or after 5 minutes (default NEAT settings)
     # creates directory for every day in which checkpoints are saved
-    if not os.path.isdir(dir_name):  # TODO multiple dirs for same day
+
+    if not os.path.isdir(dir_name):
         os.mkdir(dir_name)
     p.add_reporter(neat.Checkpointer(checkpoint_interval, filename_prefix=dir_name + '/' + CHECKPOINT_PREFIX))
 
-    # # Run until fitness threshold is reached (round on track is completed)
-    # winner = p.run(evaluate_genomes)
+    # Starts countdown, if enabled
+    if countdown_enabled:
+        # 5 sec countdown
+        for i in list(range(3))[::-1]:
+            print(i + 1)
+            time.sleep(1)
+    # Run until fitness threshold is reached (round on track is completed)
+    winner = p.run(evaluate_genomes)
 
     # # visualize winning genome
     # vis.draw_net(config, winner, True)
@@ -103,11 +95,5 @@ def run(config_file):
 
 
 if __name__ == '__main__':
-    if cnt_enabled:
-        # 5 sec countdown
-        for i in list(range(3))[::-1]:
-            print(i + 1)
-            time.sleep(1)
-
     config_path = os.path.join(os.path.dirname(__file__), 'config')  # loads config from same dir this file is in
     run(config_path)

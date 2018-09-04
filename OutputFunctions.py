@@ -148,6 +148,7 @@ def kill(way='restart'):
         time.sleep(3)
         exitbox()
     reset()  # resets controls
+    steer(0.5)
 
 
 def exitboxmenu():
