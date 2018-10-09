@@ -67,10 +67,8 @@ def steertest():
 # steertest()
 # inputtest(2000000)
 time.sleep(2)
-while 1:
-    if InputFunctions.checkOnTrack() != 1:
-        InputFunctions.resetflyinglap()
-        OutputFunctions.kill('restart')
+OutputFunctions.steer(0.5)
+time.sleep(30)
 # OutputFunctions.reset()
 # OutputFunctions.exitbox()
 # time.sleep(5)
