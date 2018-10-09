@@ -1,6 +1,8 @@
 from OutputFunctions import steer, usepedals
 import numpy as np
-from InputFunctions import checkOnTrack, get_info
+import socket
+import pickle
+from InputFunctions import checkOnTrack, get_car_info
 import neat
 import time
 
@@ -9,7 +11,7 @@ def control_car(nn_output):
     """evaluates output node with highest confidence and controls car"""
     nn_output = np.asarray(nn_output)
     index = np.argmax(nn_output)  # gets index of highest value
-    # print(index, '\n', nn_output, '\n')
+    # print(index, '\n')
 
     # throttle
     if index == 0:
@@ -66,5 +68,6 @@ def drive_loop(net):
     """population-member (organism) receives track progress as input and continually uses output to drive until it
     gets off track or stands still too long """
     while checkOnTrack():
-        output = net.activate([get_info()[9]])  # uses track progress as input
+        net_input = get_car_info().tolist()
+        output = net.activate(net_input)  # uses track progress as input
         control_car(output)  # controls car with computed output, see dictionary above

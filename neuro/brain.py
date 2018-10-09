@@ -1,8 +1,8 @@
 import neuro.controller as control
-from InputFunctions import get_info, resetflyinglap, reset_time
+from InputFunctions import get_car_info, get_lap_info, resetflyinglap, reset_time
 from OutputFunctions import kill
 from decimal import Decimal
-import neuro.visualize as vis
+# import neuro.visualize as vis
 import neat
 import os
 import time
@@ -40,7 +40,7 @@ def set_fitness():
     """fitness function
     returns fitness for current organism"""
     # current lap (0 if flying start) + track progress - reset position (differs for each track)
-    return round(get_info()[9] + get_info()[13] - 0.81, 2)
+    return get_car_info()[6] + get_lap_info()[3] - 0.81
 
 
 def check_checkpoint(config):

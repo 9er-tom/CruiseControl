@@ -27,23 +27,36 @@ os.environ['PATH'] = os.environ['PATH'] + ";."
 #   return car, track
 
 
-def get_info():
+def get_car_info():
+    return numpy.array([info.physics.gear,
+                        info.physics.rpms,
+                        info.physics.speedKmh,
+                        # info.physics.wheelSlip,
+                        # info.physics.wheelLoad,
+                        # info.physics.tyreCoreTemperature,
+                        # info.physics.kersCharge,
+                        # checkOnTrack(),
+                        info.graphics.carCoordinates[0],
+                        info.graphics.carCoordinates[1],
+                        info.graphics.carCoordinates[2],
+                        info.graphics.normalizedCarPosition,
+                        # info.graphics.iCurrentTime,
+                        # info.graphics.iLastTime,
+                        # info.graphics.iBestTime,
+                        # info.graphics.numberOfLaps + 1 - flyingstart,
+                        # info.static.carModel,
+                        # info.static.track
+                        ], dtype=object)
+
+
+def get_lap_info():
     position = info.graphics.normalizedCarPosition
     global flyingstart
     # print(flyingstart)  # testing purposes
     if flyingstart > 0 and 0 < position < 0.1:
         flyingstart = 0
-    return numpy.array([info.physics.gear,
-                        info.physics.rpms,
-                        info.physics.speedKmh,
-                        info.physics.wheelSlip,
-                        info.physics.wheelLoad,
-                        info.physics.tyreCoreTemperature,
-                        info.physics.kersCharge,
-                        checkOnTrack(),
-                        info.graphics.carCoordinates,
-                        info.graphics.normalizedCarPosition,
-                        info.graphics.iCurrentTime,
+
+    return numpy.array([info.graphics.iCurrentTime,
                         info.graphics.iLastTime,
                         info.graphics.iBestTime,
                         info.graphics.numberOfLaps + 1 - flyingstart,
@@ -64,6 +77,7 @@ def checkOnTrack():
             and info.graphics.isInPit <= 0
             and time.time() - timewaiting <= 3)
 
+
 def reset_time():
     global timewaiting
     timewaiting = time.time()
@@ -83,4 +97,4 @@ if __name__ == '__main__':
             time.sleep(1)
     while True:  # displays track info every 0.5 seconds
         time.sleep(1)
-        print(get_info())
+        print(get_car_info())
