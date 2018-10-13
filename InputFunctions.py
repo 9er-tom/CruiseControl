@@ -75,6 +75,7 @@ def checkOnTrack():
 
 
 def resetflyinglap():
+    global flyingstart
     flyingstart = 1
     return 0
 
