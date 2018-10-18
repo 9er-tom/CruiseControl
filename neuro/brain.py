@@ -40,7 +40,7 @@ def set_fitness():
     """fitness function
     returns fitness for current organism"""
     # current lap (0 if flying start) + track progress - reset position (differs for each track)
-    return get_car_info()[6] + get_lap_info()[3] - 0.81
+    return get_car_info()[3] + get_lap_info()[3] - 0.81
 
 
 def check_checkpoint(config):

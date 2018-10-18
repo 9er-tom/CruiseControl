@@ -6,17 +6,20 @@ import cv2
 # def process_image(original_image):
 
 def process_image(og_image):
-
-    proc_screen = cv2.cvtColor(og_image, cv2.COLOR_BGR2GRAY)
-    proc_screen = cv2.threshold(proc_screen, 90, 255, cv2.THRESH_BINARY)[1]
-    # proc_screen = cv2.Canny(og_image, threshold1=200, threshold2=300)
-
+    thresh = 80
+    # proc_screen = cv2.cvtColor(og_image, cv2.COLOR_BGR2GRAY)
+    # proc_screen = cv2.threshold(proc_screen, 90, 255, cv2.THRESH_BINARY)[1]
+    proc_screen = np.array(og_image.convert('L'))
+    proc_screen[proc_screen < thresh] = 0
+    proc_screen[proc_screen >= thresh] = 255
+    proc_screen = cv2.resize(proc_screen, (40, 40))
     cv2.imshow('map cap', proc_screen)
 
 
 if __name__ == '__main__':
     while True:
-        screen = np.array(grab.grab(bbox=(700, 480, 900, 780)))
+        screen = grab.grab(bbox=(50, 600 - 210, 250, 600))  # AC 800x600, upper left corner of screen
+        # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
         # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
         process_image(screen)
 

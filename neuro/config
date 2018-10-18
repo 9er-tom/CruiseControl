@@ -4,14 +4,15 @@
 # or the experiment itself.  This is the only required section.
 [NEAT]
 fitness_criterion     = max
-fitness_threshold     = 600.0
+fitness_threshold     = 0.99
 pop_size              = 100
 reset_on_extinction   = 0
 
 [DefaultGenome]
 num_inputs              = 4
-num_hidden              = 1
-num_outputs             = 1
+num_hidden              = 0
+num_outputs             = 500
+
 initial_connection      = partial_direct 0.5
 feed_forward            = True
 compatibility_disjoint_coefficient    = 1.0
@@ -22,7 +23,7 @@ node_add_prob           = 0.2
 node_delete_prob        = 0.2
 activation_default      = sigmoid
 activation_options      = sigmoid
-activation_mutate_rate  = 0.0
+activation_mutate_rate  = 0.05
 aggregation_default     = sum
 aggregation_options     = sum
 aggregation_mutate_rate = 0.0

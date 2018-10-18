@@ -36,9 +36,9 @@ def get_car_info():
                         # info.physics.tyreCoreTemperature,
                         # info.physics.kersCharge,
                         # checkOnTrack(),
-                        info.graphics.carCoordinates[0],
-                        info.graphics.carCoordinates[1],
-                        info.graphics.carCoordinates[2],
+                        # info.graphics.carCoordinates[0],
+                        # info.graphics.carCoordinates[1],
+                        # info.graphics.carCoordinates[2],
                         info.graphics.normalizedCarPosition,
                         # info.graphics.iCurrentTime,
                         # info.graphics.iLastTime,
@@ -68,14 +68,14 @@ def checkOnTrack():
     global timewaiting
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
-    if info.physics.speedKmh > 2:
+    if info.physics.speedKmh > 5:
         timewaiting = time.time()
         # print(time.time() - timewaiting)
     return (info.physics.numberOfTyresOut <= 0
             and numpy.sum(info.physics.tyreDirtyLevel) <= 0.05
             and numpy.sum(info.physics.carDamage) <= 0.05
             and info.graphics.isInPit <= 0
-            and time.time() - timewaiting <= 3)
+            and time.time() - timewaiting <= 1.5)
 
 
 def reset_time():
