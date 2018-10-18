@@ -1,4 +1,7 @@
 import tensorflow as tf
+import numpy as np
+from neuro.Controller import control
+import InputFunctions
 
 inputvars = 0
 reaktionen = 0
@@ -17,7 +20,7 @@ def init():
     klatschs = tf.placeholder(shape=[None],dtype=tf.int32, name='S1')
 
     Y = tf.layers.dense(inputvars, 200 , activation = tf.nn.relu)#single dense HL (vielleicht 2 hidden layer daraus machen?)
-    Ylogits = tf.layers.dense(Y,20*5*5)
+    Ylogits = tf.layers.dense(Y, 20*5*5)
 
     rea = tf.multinomial(logits=Ylogits, num_samples=1) #erstellt eine ream aus output mit softmax
 
@@ -38,13 +41,17 @@ def train():
 
     with tf.Session() as sess:
         #reset
-        while True: #while not gwatscht
-            #inputvars setzen
+        ontrack = True
+        while ontrack: #while not gwatscht
             inputvar = 0
+            ontrack=InputFunctions.checkOnTrack()
+
 
             reaktion = sess.run(rea, feed_dict={inputvars: [inputvar]})
 
-            #step and get info all and klatschs
+            #step and get klatschs
+            print(reaktion)
+            control(reaktion)
             klatsch = 0
 
             inputvars.append(inputvar)

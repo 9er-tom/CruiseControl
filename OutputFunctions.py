@@ -11,7 +11,8 @@ import time
     return steering'''
 
 def steer(steering=0.5):  # 0 = links  0.5 = mitte 1 = rechts
-    j.set_axis(pyvjoy.HID_USAGE_X, steering*32768)
+    print(int(steering*32768))
+    j.set_axis(pyvjoy.HID_USAGE_X, int(steering*32768))
     return steering
 
 def shift(gear=0):  # 0 = Neutral#
@@ -37,9 +38,9 @@ def shift(gear=0):  # 0 = Neutral#
 
 
 def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
-    j.set_axis(pyvjoy.HID_USAGE_Y, throttle*32768)
-    j.set_axis(pyvjoy.HID_USAGE_RX, brake*32768)
-    j.set_axis(pyvjoy.HID_USAGE_RY, clutch*32768)
+    j.set_axis(pyvjoy.HID_USAGE_Y, int(throttle*32768))
+    j.set_axis(pyvjoy.HID_USAGE_RX, int(brake*32768))
+    j.set_axis(pyvjoy.HID_USAGE_RY, int(clutch*32768))
     return 0
 
 
@@ -141,8 +142,11 @@ def kill(way='restart'):
         k.press('n')
         time.sleep(0.02)
         k.release('n')
+        time.sleep(2)
+        k.press('y')
+        time.sleep(0.02)
+        k.release('y')
         k.release(pynput.keyboard.Key.ctrl_l)
-        time.sleep(3)
         exitboxmenu()
     elif way == 'box':
         k.press(pynput.keyboard.Key.ctrl_l)
@@ -169,7 +173,9 @@ m = pynput.mouse.Controller()
 
 j.reset()
 j.update()
-steer(0.5)
+steer(0.7)
+#time.sleep(2)
+
 
 if __name__ == '__main__':
     time.sleep(2)
