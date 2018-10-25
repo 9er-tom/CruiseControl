@@ -13,16 +13,24 @@ def process_image(og_image):
     proc_screen[proc_screen < thresh] = 0
     proc_screen[proc_screen >= thresh] = 255
     proc_screen = cv2.resize(proc_screen, (40, 40))
+    input_array = np.ndarray.flatten(proc_screen)
+    input_array[input_array == 255] = 1
     cv2.imshow('map cap', proc_screen)
+    return input_array
+
+
+def grab_screen():
+        screen = grab.grab(bbox=(50, 600 - 210, 250, 600))  # AC 800x600, upper left corner of screen
+        # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
+        # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
+        retval = process_image(screen)
+        print(len(retval))
+        return retval
 
 
 if __name__ == '__main__':
     while True:
-        screen = grab.grab(bbox=(50, 600 - 210, 250, 600))  # AC 800x600, upper left corner of screen
-        # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
-        # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
-        process_image(screen)
-
+        grab_screen()
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break

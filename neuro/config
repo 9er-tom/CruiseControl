@@ -9,7 +9,7 @@ pop_size              = 100
 reset_on_extinction   = 0
 
 [DefaultGenome]
-num_inputs              = 4
+num_inputs              = 1600
 num_hidden              = 0
 num_outputs             = 500
 

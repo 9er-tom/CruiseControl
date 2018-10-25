@@ -5,6 +5,7 @@ import pickle
 from InputFunctions import checkOnTrack, get_car_info
 import neat
 import time
+from neuro.screengrab import grab_screen
 
 
 def control_car(nn_output):
@@ -80,5 +81,9 @@ def drive_loop(net):
     gets off track or stands still too long """
     while checkOnTrack():
         net_input = get_car_info().tolist()
-        output = net.activate(net_input)  # uses track progress as input
+        # output = net.activate(net_input)  # uses track progress as input
+        print("check 1")
+        img_array = grab_screen()
+        print("check 2")
+        output = net.activate(img_array)  # uses track map image array as input
         heresy_control(output)  # controls car with computed output, see dictionary above
