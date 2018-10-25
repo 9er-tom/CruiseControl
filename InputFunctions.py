@@ -32,22 +32,23 @@ def get_info():
     print(flyingstart)  # testing purposes
     if flyingstart > 0 and 0 < position < 10:
         flyingstart = 0
-    return numpy.array([info.physics.gear,
-                        info.physics.rpms,
+    return numpy.array([#info.physics.gear,
+                        #info.physics.rpms,
                         info.physics.speedKmh,
-                        info.physics.wheelSlip,
+                        #info.physics.wheelSlip,
                         info.physics.wheelLoad,
-                        info.physics.tyreCoreTemperature,
-                        info.physics.kersCharge,
-                        checkOnTrack(),
-                        info.graphics.carCoordinates,
-                        info.graphics.normalizedCarPosition,
-                        info.graphics.iCurrentTime,
-                        info.graphics.iLastTime,
-                        info.graphics.iBestTime,
-                        info.graphics.numberOfLaps - flyingstart,
-                        info.static.carModel,
-                        info.static.track], dtype=object)
+                        #info.physics.tyreCoreTemperature,
+                        #info.physics.kersCharge,
+                        #checkOnTrack(),
+                        #info.graphics.carCoordinates,
+                        info.graphics.normalizedCarPosition],
+                        #info.graphics.iCurrentTime,
+                        #info.graphics.iLastTime,
+                        #info.graphics.iBestTime,
+                        #info.graphics.numberOfLaps - flyingstart,
+                        #info.static.carModel,
+                        #info.static.track],
+                        dtype=object)
 
 
 def checkOnTrack():
@@ -75,7 +76,7 @@ def checkOnTrack():
 
 
 def resetflyinglap():
-    global flyingstart
+    global flyingstart#
     flyingstart = 1
     return 0
 

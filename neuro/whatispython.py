@@ -4,14 +4,13 @@ import numpy as np
 
 col = Image.open("Aertong.png")
 gray = col.convert('L')
-res = cv2.resize(gray, dsize=(40, 40), interpolation=cv2.INTER_CUBIC)
 
 # Let numpy do the heavy lifting for converting pixels to pure black or white
-bw = np.asarray(res).copy()
-
+bw = np.asarray(gray).copy()
+bw = cv2.resize(bw, dsize=(40, 40), interpolation=cv2.INTER_CUBIC)
 # Pixel range is 0...255, 256/2 = 128
-bw[bw < 128] = 0    # Black
-bw[bw >= 128] = 255 # White set to 1
+bw[bw < 70] = 0    # Black
+bw[bw >= 184] = 255 # White set to 1
 
 print(bw)
 

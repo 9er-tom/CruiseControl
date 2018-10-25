@@ -2,6 +2,8 @@ import tensorflow as tf
 import numpy as np
 from neuro.Controller import control
 import InputFunctions
+import neuro.screengrab as scgrb
+import InputFunctions
 
 inputvars = 0
 reaktionen = 0
@@ -43,7 +45,8 @@ def train():
         #reset
         ontrack = True
         while ontrack: #while not gwatscht
-            inputvar = 0
+            inputvar = scgrb.process_image()
+            inputvar.extend(InputFunctions.get_info())
             ontrack=InputFunctions.checkOnTrack()
 
 
