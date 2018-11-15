@@ -24,7 +24,6 @@ def grab_screen():
         # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
         # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
         retval = process_image(screen)
-        print(len(retval))
         return retval
 
 

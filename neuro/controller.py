@@ -1,7 +1,5 @@
 from OutputFunctions import steer, usepedals
 import numpy as np
-import socket
-import pickle
 from InputFunctions import checkOnTrack, get_car_info
 import neat
 import time
@@ -14,7 +12,6 @@ def control_car(nn_output):
     index = np.argmax(nn_output)  # gets index of highest value
     # print(index, '\n')
 
-    # throttle
     if index == 0:
         usepedals(throttle=0.2)
     elif index == 1:
@@ -86,4 +83,5 @@ def drive_loop(net):
         img_array = grab_screen()
         print("check 2")
         output = net.activate(img_array)  # uses track map image array as input
-        heresy_control(output)  # controls car with computed output, see dictionary above
+        control_car(output)
+        #  heresy_control(output)  # controls car with computed output, see dictionary above
