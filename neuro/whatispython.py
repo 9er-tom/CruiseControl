@@ -1,7 +1,11 @@
-from PIL import Image
-import cv2
-import numpy as np
+#from PIL import Image
+#import cv2
+#import numpy as np
+from neuro.Controller import control
+import time
+#from decimal import Decimal
 
+'''
 col = Image.open("Aertong.png")
 gray = col.convert('L')
 
@@ -19,11 +23,12 @@ imfile = Image.fromarray(bw)
 imfile.save("result_bw.png")
 
 
-#from neuro.Controller import control
-#import time
 
-#i=0
-#while i<500:
-#    control(i)
-#    i+=1
-#    time.sleep(0.02)
+'''
+time.sleep(5)
+i=0
+while i<49:
+    control(i)
+    i+=1
+    time.sleep(0.5)
+

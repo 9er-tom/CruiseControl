@@ -11,7 +11,6 @@ import time
     return steering'''
 
 def steer(steering=0.5):  # 0 = links  0.5 = mitte 1 = rechts
-    print(int(steering*32768))
     j.set_axis(pyvjoy.HID_USAGE_X, int(steering*32768))
     return steering
 
@@ -38,6 +37,10 @@ def shift(gear=0):  # 0 = Neutral#
 
 
 def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
+    if(throttle<0.0):
+        throttle = 0.0
+    else:
+        brake = 0.0
     j.set_axis(pyvjoy.HID_USAGE_Y, int(throttle*32768))
     j.set_axis(pyvjoy.HID_USAGE_RX, int(brake*32768))
     j.set_axis(pyvjoy.HID_USAGE_RY, int(clutch*32768))

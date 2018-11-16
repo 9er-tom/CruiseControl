@@ -9,7 +9,7 @@ gym: 0.7.3
 """
 
 import numpy as np
-import pandas as pd
+#import pandas as pd
 import tensorflow as tf
 
 np.random.seed(1)
@@ -27,7 +27,7 @@ class DeepQNetwork:
             e_greedy=0.9,
             replace_target_iter=300,
             memory_size=500,
-            batch_size=32,
+            batch_size=32, #40*40 + 4 + 1 + 1
             e_greedy_increment=None,
             output_graph=False,
     ):
