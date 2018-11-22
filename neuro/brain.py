@@ -1,6 +1,6 @@
 import neuro.controller as control
 from InputFunctions import get_car_info, get_lap_info, resetflyinglap, reset_time
-from OutputFunctions import kill
+from OutputFunctions import kill, usepedals
 from decimal import Decimal
 # import neuro.visualize as vis
 import neat
@@ -25,6 +25,9 @@ def evaluate_genomes(genomes, config):
 
         resetflyinglap()  # resets flying start counter
         reset_time()
+
+        usepedals(throttle=1)
+        time.sleep(0.2)
         control.drive_loop(net)  # starts driving loop
 
         genome.fitness = -1 if set_fitness() == 0 else set_fitness()  # fitness function
@@ -71,6 +74,12 @@ def run(config_file):
 
     # creates checkpoint after set number of generations or after 5 minutes (default NEAT settings)
     # creates directory for every day in which checkpoints are saved
+
+    # delete empty directories
+    dirs = os.walk('.')
+    for d in dirs:
+        if not d[2]:
+            os.rmdir(d[0])
 
     if not os.path.isdir(dir_name):
         os.mkdir(dir_name)

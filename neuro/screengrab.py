@@ -15,7 +15,6 @@ def process_image(og_image):
     proc_screen = cv2.resize(proc_screen, (40, 40))
     input_array = np.ndarray.flatten(proc_screen)
     input_array[input_array == 255] = 1
-    cv2.imshow('map cap', proc_screen)
     return input_array
 
 
@@ -23,9 +22,8 @@ def grab_screen():
         screen = grab.grab(bbox=(50, 600 - 210, 250, 600))  # AC 800x600, upper left corner of screen
         # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
         # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
-        retval = process_image(screen)
-        print(len(retval))
-        return retval
+        return process_image(screen)
+        # return retval
 
 
 if __name__ == '__main__':

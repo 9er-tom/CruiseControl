@@ -5,13 +5,13 @@
 [NEAT]
 fitness_criterion     = max
 fitness_threshold     = 0.99
-pop_size              = 100
+pop_size              = 50
 reset_on_extinction   = 0
 
 [DefaultGenome]
 num_inputs              = 1600
 num_hidden              = 0
-num_outputs             = 500
+num_outputs             = 49
 
 initial_connection      = partial_direct 0.5
 feed_forward            = True

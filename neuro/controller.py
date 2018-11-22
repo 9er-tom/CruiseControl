@@ -70,20 +70,24 @@ def heresy_control(out):
     out = np.argmax(nn_output)  # gets index of highest value
     # print(index, '\n')
 
-    steer((int(out / 25)) / 20)
+    # steer((int(out / 25)) / 20)
     # print((out % 25) / 5)
     # print(((out % 10) % 5) / 5)
-    usepedals(throttle=((out % 10) % 5) / 5, brake=(out % 25) / 5)
+    # usepedals(throttle=((out % 10) % 5) / 5, brake=(out % 25) / 5)
+
+    out -= 24
+    pedals = (int(round((out / 5) - int(out / 5), 1) * 5)) / 4
+    steer(abs((int(out / 5) / 4)) / 3)
+    usepedals(brake=pedals * (-1), throttle=pedals)
 
 
 def drive_loop(net):
     """population-member (organism) receives track progress as input and continually uses output to drive until it
     gets off track or stands still too long """
     while checkOnTrack():
-        net_input = get_car_info().tolist()
+        # net_input = get_car_info()
         # output = net.activate(net_input)  # uses track progress as input
-        print("check 1")
         img_array = grab_screen()
-        print("check 2")
+        np.append(img_array, get_car_info()[2])
         output = net.activate(img_array)  # uses track map image array as input
         heresy_control(output)  # controls car with computed output, see dictionary above
