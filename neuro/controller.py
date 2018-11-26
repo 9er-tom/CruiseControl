@@ -82,10 +82,15 @@ def drive_loop(net):
     """population-member (organism) receives track progress as input and continually uses output to drive until it
     gets off track or stands still too long """
     while checkOnTrack():
-        # net_input = get_car_info()
-        # output = net.activate(net_input)  # uses track progress as input
-        img_array = grab_screen()
-        np.append(img_array, get_car_info()[2])
-        output = net.activate(img_array)  # uses track map image array as input
-        control_car(output)
-        #  heresy_control(output)  # controls car with computed output, see dictionary above
+
+        # output = net.activate(image_control())  # uses track map image array as input
+        output = net.activate(get_car_info())  # uses car data as input
+
+        # control_car(output)
+        heresy_control(output)  # controls car with computed output, see dictionary above
+
+
+def image_control():
+    img_array = grab_screen()
+    np.append(img_array, get_car_info()[2])
+    return img_array

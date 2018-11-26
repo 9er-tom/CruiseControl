@@ -12,7 +12,7 @@ countdown_enabled = True
 
 # ----- Checkpoint parameters  ----- #
 CHECKPOINT_PREFIX = 'cp-'  # prefix of checkpoint files
-checkpoint_interval = 10  # numbers of generation after which a checkpoint is saved
+checkpoint_interval = 1  # numbers of generation after which a checkpoint is saved
 dir_name = 'training-' + datetime.datetime.today().strftime('%Y-%m-%d_%Hh-%Mm-%Ss')  # checkpoint directory name
 
 
