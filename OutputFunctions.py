@@ -38,7 +38,10 @@ def shift(gear=0):  # 0 = Neutral#
 
 
 def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
-    # print(clutch, brake, throttle)
+    if throttle < 0.0:
+        throttle = 0.0
+    else:
+        brake = 0.0
     j.set_axis(pyvjoy.HID_USAGE_Y, int(throttle * 32768))
     j.set_axis(pyvjoy.HID_USAGE_RX, int(brake * 32768))
     j.set_axis(pyvjoy.HID_USAGE_RY, int(clutch * 32768))

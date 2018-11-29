@@ -27,7 +27,7 @@ def evaluate_genomes(genomes, config):
         reset_time()
 
         usepedals(throttle=1)
-        time.sleep(0.2)
+        time.sleep(0.5)
         control.drive_loop(net)  # starts driving loop
 
         genome.fitness = -1 if set_fitness() == 0 else set_fitness()  # fitness function
