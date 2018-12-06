@@ -7,6 +7,7 @@ from neuro.screengrab import grab_screen
 
 prevIndex = -1
 
+
 def control_car(nn_output):
     """evaluates output node with highest confidence and controls car"""
     nn_output = np.asarray(nn_output)
@@ -84,15 +85,35 @@ def heresy_control(nn_output):
     usepedals(brake=pedals, throttle=pedals * (-1))
 
 
+def idiot_control(nn_output):
+    global prevIndex
+    out = np.argmax(nn_output)
+
+    if out != prevIndex:
+        print(out, '\n')
+        prevIndex = out
+
+    if out == 0:
+        steer(0)
+    if out == 1:
+        steer(0.65)
+    if out == 2:
+        steer(0.35)
+
+
 def drive_loop(net):
     """population-member (organism) receives track progress as input and continually uses output to drive until it
     gets off track or stands still too long """
     while checkOnTrack():
-        # output = net.activate(image_control())  # uses track map image array as input
-        output = net.activate(get_car_info())  # uses car data as input
+        output = net.activate(image_control())  # uses track map image array as input
+
+        # output = net.activate(get_car_info())  # uses car data as input
 
         # control_car(output)
-        heresy_control(np.asarray(output))  # controls car with computed output, see dictionary above
+        # heresy_control(np.asarray(output))  # controls car with computed output, see dictionary above
+
+        usepedals(throttle=0.2)
+        idiot_control(np.asarray(output))
 
 
 def image_control():

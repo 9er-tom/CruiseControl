@@ -95,42 +95,40 @@ def reset():
     j.update()
 
 
-def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'):  # teilweise noch nach altem prinzip
-    if track == 'ks_zandvoort':
-        if car == 'ks_bmw_m235i_racing':
-            c = 1
-            steer(0)
-            usepedals(c, 0, 0.1220703125)
-            shift(1)
-            time.sleep(5)
-            while c > 0:
-                c -= 0.0001
-                usepedals(c, 0, 0.1220703125)
-                time.sleep(0.0005)
-            time.sleep(0.5)
-            x = 0
-            while x > -3500:
-                x -= 10
-                steer(x)
-                time.sleep(0.0005)
-            time.sleep(1)
+def exitbox():  # teilweise noch nach altem prinzip
+    c = 1
+    steer(0)
+    usepedals(c, 0, 0.1220703125)
+    shift(1)
+    time.sleep(5)
+    while c > 0:
+        c -= 0.0001
+        usepedals(c, 0, 0.1220703125)
+        time.sleep(0.0005)
+    time.sleep(0.5)
+    x = 0
+    while x > -3500:
+        x -= 10
+        steer(x)
+        time.sleep(0.0005)
+    time.sleep(1)
 
-            while x < 1:
-                x += 10
-                steer(x)
-                time.sleep(0.0005)
-            time.sleep(2.2)
+    while x < 1:
+        x += 10
+        steer(x)
+        time.sleep(0.0005)
+    time.sleep(2.2)
 
-            while x < 3500:
-                x += 10
-                steer(x)
-                time.sleep(0.0005)
-            time.sleep(0.57)
+    while x < 3500:
+        x += 10
+        steer(x)
+        time.sleep(0.0005)
+    time.sleep(0.57)
 
-            while x > -1:
-                x -= 10
-                steer(x)
-                time.sleep(0.0005)
+    while x > -1:
+        x -= 10
+        steer(x)
+        time.sleep(0.0005)
 
 
 def kill(way='restart'):
