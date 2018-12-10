@@ -4,9 +4,15 @@ import tensorflow as tf
 import matplotlib.pylab as plt
 import random
 import math
+import InputFunctions
+import OutputFunctions
+import neuro.screengrab as screengrab
+import neuro.Controller as controller
+import os
+import time
 
-MAX_EPSILON = 1
-MIN_EPSILON = 0.01
+MAX_EPSILON = 0.2
+MIN_EPSILON = 0.005
 LAMBDA = 0.0001
 GAMMA = 0.99
 BATCH_SIZE = 50
@@ -30,10 +36,12 @@ class Model:
     def _define_model(self):
         self._states = tf.placeholder(shape=[None, self._num_states], dtype=tf.float32)
         self._q_s_a = tf.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
-        # 2 vollverknüpfte hl 600n
-        fc1 = tf.layers.dense(self._states, 600, activation=tf.nn.relu)
-        fc2 = tf.layers.dense(fc1, 600, activation=tf.nn.relu)
-        self._logits = tf.layers.dense(fc2, self._num_actions)
+        #fc1 = tf.layers.conv2d()
+        #fc2 = tf.layers
+        # 2 vollverknüpfte hl 800n
+        fc2 = tf.layers.dense(self._states, 800, activation=tf.nn.relu)
+        fc3 = tf.layers.dense(fc2, 800, activation=tf.nn.relu)
+        self._logits = tf.layers.dense(fc3, self._num_actions)
         loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
         self._optimizer = tf.train.AdamOptimizer().minimize(loss)
         self._var_init = tf.global_variables_initializer()
@@ -82,11 +90,39 @@ class Memory:
             return random.sample(self._samples, no_samples)
 
 
+class Interpreter:
+    def reset(self):
+        OutputFunctions.kill() #OMG WENN DU INPUTS ÄNERST BITTE ÄNDER A DEN SCHEISS BRING MI UM
+        #state = InputFunctions.get_info()
+        #state= np.append(state, screengrab.grab_screen())
+        state = screengrab.grab_screen()
+        return state
+
+    def step(self,action):
+        #print(action)
+        controller.hardcontrol(action)
+        #inputs = InputFunctions.get_info()
+        #next_state = inputs
+        screen = screengrab.grab_screen()
+        next_state = screen
+        #print(len(next_state))
+        #next_state = np.append(inputs, screen)
+
+        #print(next_state)
+        done = False;
+        if(not InputFunctions.checkOnTrack() or InputFunctions.getdistance() >= 2):
+            done = True
+
+        reward = InputFunctions.calculatereward()
+        info = 0 #möglicher Slot für AI Info
+        return next_state, reward, done, info
+
+
 class GameRunner:
-    def __init__(self, sess, model, env, memory, max_eps, min_eps,
+    def __init__(self, sess, model, interpreter, memory, max_eps, min_eps,
                  decay, render=True):
         self._sess = sess
-        self._env = env
+        self._env = interpreter
         self._model = model
         self._memory = memory
         self._render = render
@@ -96,27 +132,29 @@ class GameRunner:
         self._eps = self._max_eps
         self._steps = 0
         self._reward_store = []
-        self._max_x_store = []
 
     def run(self):
-        state = self._env.reset()
+        posx = InputFunctions.getpos()
+        while(posx == InputFunctions.getpos()):
+            state = self._env.reset(self)
+            OutputFunctions.usepedals(throttle=1)
+            time.sleep(0.4)
+            OutputFunctions.usepedals(brake=1)
         tot_reward = 0
-        max_x = -100
+        #max_x = -100
         while True:
-            if self._render:
-                self._env.render()
+            #if self._render:
+                #self._env.render()
 
             action = self._choose_action(state)
-            next_state, reward, done, info = self._env.step(action)
-            if next_state[0] >= 0.1:
+            next_state, reward, done, info = self._env.step(self,action)
+            '''if next_state[0] >= 0.1:
                 reward += 10
             elif next_state[0] >= 0.25:
                 reward += 20
             elif next_state[0] >= 0.5:
                 reward += 100
-
-            if next_state[0] > max_x:
-                max_x = next_state[0]
+            '''
             # Runde Abgeschlossen, oder fehlgeschlagen -> nächster Status = none || Speichergrüne
             if done:
                 next_state = None
@@ -124,22 +162,23 @@ class GameRunner:
             self._memory.add_sample((state, action, reward, next_state))
             self._replay()
 
-            # exponentially decay the eps value
+            # epsilon mit regression exponentiell annähern
             self._steps += 1
             self._eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) \
                                       * math.exp(-LAMBDA * self._steps)
 
-            # move the agent to the next state and accumulate the reward
+            # nächster state + belohnung holen
             state = next_state
             tot_reward += reward
 
-            # if the game is done, break the loop
+            # wenn das auto von der Strecke ist, oder eine Runde geschafft hat, schleife unterbrechen
             if done:
                 self._reward_store.append(tot_reward)
-                self._max_x_store.append(max_x)
                 break
 
         print("Step {}, Total reward: {}, Eps: {}".format(self._steps, tot_reward, self._eps))
+        if (tot_reward>10000):
+            OutputFunctions.momgetthecamera()
 
     def _choose_action(self, state):
         if random.random() < self._eps:
@@ -151,25 +190,26 @@ class GameRunner:
         batch = self._memory.sample(self._model.batch_size)
         states = np.array([val[0] for val in batch])
         next_states = np.array([(np.zeros(self._model.num_states)
-                                 if val[3] is None else val[3]) for val in batch])
-        # predict Q(s,a) given the batch of states
+                                 if val[3] is None else val[3]) for val in batch]) # Problem für übergroße Arrays...
+
+        # mit den vorhandenen Staten Q(s,a) errechnen
         q_s_a = self._model.predict_batch(states, self._sess)
-        # predict Q(s',a') - so that we can do gamma * max(Q(s'a')) below
+        # ableiten von Q(s,a) zu Q(s',a') - um gamma * max(Q(s'a')) auszuführen
         q_s_a_d = self._model.predict_batch(next_states, self._sess)
-        # setup training arrays
+        # trainingstabelle erstellen
         x = np.zeros((len(batch), self._model.num_states))
         y = np.zeros((len(batch), self._model.num_actions))
         for i, b in enumerate(batch):
             state, action, reward, next_state = b[0], b[1], b[2], b[3]
-            # get the current q values for all actions in state
+            # q values für jeden status errechnen
             current_q = q_s_a[i]
-            # update the q value for action
+            # q values für jeder action errechnen
             if next_state is None:
-                # in this case, the game completed after action, so there is no max Q(s',a')
+                # ende der runde max Q(s',a') wird errechnet
                 # prediction possible
                 current_q[action] = reward
             else:
-                current_q[action] = reward + GAMMA * np.amax(q_s_a_d[i])
+                current_q[action] = reward + GAMMA * np.amax(q_s_a_d[i]) # Q(s',a') wird errechnet
             x[i] = state
             y[i] = current_q
         self._model.train_batch(self._sess, x, y)
@@ -184,27 +224,40 @@ class GameRunner:
 
 if __name__ == "__main__":
     #env = gym.make(env_name)
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-    num_states = env.env.observation_space.shape[0]
-    num_actions = env.env.action_space.n
 
-    model = Model(num_states, num_actions, BATCH_SIZE)
-    mem = Memory(50000)
-
-    with tf.Session() as sess:
-        sess.run(model.var_init)
-        gr = GameRunner(sess, model, env, mem, MAX_EPSILON, MIN_EPSILON,
-                        LAMBDA)
-        num_episodes = 300
-        cnt = 0
-        while cnt < num_episodes:
-            if cnt % 10 == 0:
-                print('Episode {} of {}'.format(cnt+1, num_episodes))
-            gr.run()
-            cnt += 1
-        plt.plot(gr.reward_store)
-        plt.show()
-        plt.close("all")
-        plt.plot(gr.max_x_store)
-        plt.show()
+    num_states = 1600 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
+    #num_actions = 49 #49 mögliche aktionen
+    num_actions = 9  # 9 mögliche aktionen
+    with tf.device("/gpu:0"):
+        inter = Interpreter
+        model = Model(num_states, num_actions, BATCH_SIZE)
+        mem = Memory(1600000) #1,6 mill memory
+        saver = tf.train.Saver()
+        config = tf.ConfigProto(allow_soft_placement=True)
+        #sess = tf.Session(config=config)
+        with tf.Session(config=config) as sess:
+            time.sleep(5)
+            #if(os.path.exists("D:/saves/model.ckpt"
+            saver.restore(sess, "D:/saves9/model.ckpt")
+            print("Model restored.")
+            print(sess.run(model.var_init))
+            gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
+                            LAMBDA)
+            num_episodes = 16000 # wat?
+            cnt = 0
+            while cnt < num_episodes: #Fehler bei 71... ram?
+                if cnt % 25 == 0:
+                    print('Episode {} of {}'.format(cnt+1, num_episodes))
+                    save_path = saver.save(sess, "D:/saves9/model.ckpt")
+                    print("Model saved in path: %s" % save_path)
+                gr.run()
+                #OutputFunctions.usepedals(throttle=0)
+                cnt += 1
+            plt.plot(gr.reward_store)
+            plt.show()
+            plt.close("all")
+            #plt.plot(gr.max_x_store)
+            plt.show()
 

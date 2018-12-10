@@ -141,13 +141,14 @@ def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'): #teilweise noch na
 
 def kill(way='restart'):
     if way == 'restart':
+        print("RESET")
         k.press(pynput.keyboard.Key.ctrl_l)
         k.press('n')
-        time.sleep(0.02)
+        time.sleep(0.5)
         k.release('n')
-        time.sleep(2)
+        time.sleep(1)
         k.press('y')
-        time.sleep(0.02)
+        time.sleep(0.5)
         k.release('y')
         k.release(pynput.keyboard.Key.ctrl_l)
         exitboxmenu()
@@ -168,6 +169,13 @@ def exitboxmenu():
     time.sleep(0.02)
     m.release(pynput.mouse.Button.left)
     return 0
+
+def momgetthecamera():
+    k.press(pynput.keyboard.Key.ctrl_l)
+    k.press('r')
+    time.sleep(1)
+    k.release('r')
+
 
 
 j = pyvjoy.VJoyDevice(1)
