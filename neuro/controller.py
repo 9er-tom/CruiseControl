@@ -2,7 +2,6 @@ from OutputFunctions import steer, usepedals
 import numpy as np
 from InputFunctions import checkOnTrack, get_car_info
 import neat
-import time
 from neuro.screengrab import grab_screen
 
 prevIndex = -1
