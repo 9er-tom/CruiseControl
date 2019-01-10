@@ -1,7 +1,6 @@
 import neuro.controller as control
 from InputFunctions import get_car_info, get_lap_info, resetflyinglap, reset_time
 from OutputFunctions import kill, usepedals
-from decimal import Decimal
 # import neuro.visualize as vis
 import neat
 import os
