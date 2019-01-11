@@ -108,14 +108,13 @@ def drive_loop(net):
 
         # output = net.activate(get_car_info())  # uses car data as input
 
-        # control_car(output)
-        # heresy_control(np.asarray(output))  # controls car with computed output, see dictionary above
+        heresy_control(np.asarray(output))  # controls car with computed output, see dictionary above
 
-        usepedals(throttle=0.2)
-        idiot_control(np.asarray(output))
+        # usepedals(throttle=0.2)
+        # idiot_control(np.asarray(output))
 
 
 def image_control():
-    img_array = grab_screen()
+    img_array = grab_screen(False)
     np.append(img_array, get_car_info()[2])
     return img_array

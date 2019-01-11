@@ -165,6 +165,14 @@ def exitboxmenu():
     # time.sleep(1)
 
 
+def capture_replay():
+    k.press(pynput.keyboard.Key.ctrl_l)
+    k.press('r')
+    time.sleep(0.1)
+    k.release(pynput.keyboard.Key.ctrl_l)
+    k.release('r')
+
+
 j = pyvjoy.VJoyDevice(1)
 k = pynput.keyboard.Controller()
 m = pynput.mouse.Controller()

@@ -1,7 +1,6 @@
 import neuro.controller as control
 from InputFunctions import get_car_info, get_lap_info, resetflyinglap, reset_time
-from OutputFunctions import kill, usepedals
-from decimal import Decimal
+from OutputFunctions import kill, usepedals, capture_replay
 # import neuro.visualize as vis
 import neat
 import os
@@ -12,7 +11,7 @@ countdown_enabled = True
 
 # ----- Checkpoint parameters  ----- #
 CHECKPOINT_PREFIX = 'cp-'  # prefix of checkpoint files
-checkpoint_interval = 1  # numbers of generation after which a checkpoint is saved
+checkpoint_interval = 5  # numbers of generation after which a checkpoint is saved
 dir_name = 'training-' + datetime.datetime.today().strftime('%Y-%m-%d_%Hh-%Mm-%Ss')  # checkpoint directory name
 
 
@@ -93,14 +92,15 @@ def run(config_file):
             time.sleep(1)
     # Run until fitness threshold is reached (round on track is completed)
     winner = p.run(evaluate_genomes)
+    capture_replay()
 
-    # # visualize winning genome
+    # visualize winning genome
     # vis.draw_net(config, winner, True)
     # vis.plot_stats(stats, ylog=False, view=True)
     # vis.plot_species(stats, view=True)
 
     # # Display the winning genome.
-    # print('\nBest genome:\n{!s}'.format(winner))
+    print('\nBest genome:\n{!s}'.format(winner))
 
 
 if __name__ == '__main__':
