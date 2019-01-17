@@ -7,6 +7,8 @@ import time
 
 cnt_enabled = False  # countdown
 flyingstart = 0
+lastabpos = info.graphics.normalizedCarPosition * 1000000
+lasttime = info.graphics.iCurrentTime /1000.0
 timewaiting = 0
 
 if platform.architecture()[0] == "64bit":
@@ -67,7 +69,7 @@ def checkOnTrack():
             and numpy.sum(info.physics.tyreDirtyLevel) <= 0.05
             and numpy.sum(info.physics.carDamage) <= 0.05
             and info.graphics.isInPit <= 0
-            and info.graphics.numberOfLaps < 2
+            and info.graphics.completedLaps < 1
             )#and rightnow - timewaiting <= 5)
 
     # onTrack = 1  # assuming car is on track and trying to disprove that
@@ -91,7 +93,7 @@ def getdistance():
     else:
         nompos = 0
     myprogress = mycurrposition
-    if(flyingstart > 0 and nompos >=0):
+    if(flyingstart > 0 and nompos >= 0):
         flyingstart = 0
 
     distance = round(nompos,5) #tracke jetzt nur fortschritt (info.graphics.numberOfLaps - flyingstart) +
@@ -101,19 +103,29 @@ def getdistance():
 
 def calculatereward():
     global flyingstart
+    global lastabpos
+    global lasttime
+    nowtime = info.graphics.iCurrentTime/1000.0
+    reltime = nowtime - lasttime
+    lasttime = nowtime
     pos = info.graphics.normalizedCarPosition
     spd =  info.physics.speedKmh
+    abpos = (flyingstart + pos) * 1000000
+    relpos = abpos - lastabpos
+    lastabpos = abpos
+    #print("relpos:",relpos,"\nabpos:",abpos,"\nlaspos:",lastabpos)
+
     if(pos < 0.5):
         flyingstart = 1
-
-    if(spd >= 0.5 and spd < 10.0):
-        reward = (flyingstart + pos) * 10
-    elif(spd < 0.5):
-        reward = -0.5
+    if(reltime > 0):
+        reward = relpos - reltime
     else:
-        #reward = getdistance() * 10000
-        reward = (flyingstart+pos) * 10
-    reward = reward - (info.graphics.iCurrentTime / 360000)
+        reward = relpos
+    #if(spd >= 0.5):
+        #reward = relpos -
+    #else:
+        #eward = -0.5
+    #reward = reward - (info.graphics.iCurrentTime / 200000)
     return reward
 
 def resetflyinglap():
@@ -125,6 +137,10 @@ def resetflyinglap():
 def getpos():
     return info.graphics.normalizedCarPosition
 
+def getlaps():
+    return info.graphics.completedLaps
+
+
 if __name__ == '__main__':
 
     if cnt_enabled:
@@ -132,6 +148,9 @@ if __name__ == '__main__':
         '''for i in list(range(5))[::-1]:
             print(i + 1)
             time.sleep(1)'''
-    while True:  # displays track info every 0.5 seconds
-        time.sleep(0.5)
-        print(get_info())
+    totalreward = 0
+    while (getlaps() < 1):
+        reward = calculatereward()
+        print(reward)
+        totalreward +=reward
+    print("Total Reward: ",totalreward)

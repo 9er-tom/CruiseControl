@@ -100,7 +100,7 @@ class Interpreter:
 
     def step(self,action):
         #print(action)
-        controller.hardcontrol(action)
+        controller.hardcontrolfifteen(action)
         #inputs = InputFunctions.get_info()
         #next_state = inputs
         screen = screengrab.grab_screen()
@@ -173,12 +173,15 @@ class GameRunner:
 
             # wenn das auto von der Strecke ist, oder eine Runde geschafft hat, schleife unterbrechen
             if done:
+                if(InputFunctions.getlaps()>=1):
+                    tot_reward+=100000
                 self._reward_store.append(tot_reward)
                 break
 
         print("Step {}, Total reward: {}, Eps: {}".format(self._steps, tot_reward, self._eps))
-        if (tot_reward>10000):
-            OutputFunctions.momgetthecamera()
+        #if (tot_reward>100000):
+         #   OutputFunctions.momgetthecamera()
+          #  exit(0)
 
     def _choose_action(self, state):
         if random.random() < self._eps:
@@ -229,7 +232,8 @@ if __name__ == "__main__":
 
     num_states = 1600 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
     #num_actions = 49 #49 mögliche aktionen
-    num_actions = 9  # 9 mögliche aktionen
+    num_actions = 15  # 15 mögliche aktionen
+    #num_actions = 9  # 9 mögliche aktionen
     with tf.device("/gpu:0"):
         inter = Interpreter
         model = Model(num_states, num_actions, BATCH_SIZE)
@@ -240,7 +244,7 @@ if __name__ == "__main__":
         with tf.Session(config=config) as sess:
             time.sleep(5)
             #if(os.path.exists("D:/saves/model.ckpt"
-            saver.restore(sess, "D:/saves9/model.ckpt")
+            saver.restore(sess, "D:/saves15/model.ckpt")
             print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
@@ -250,7 +254,7 @@ if __name__ == "__main__":
             while cnt < num_episodes: #Fehler bei 71... ram?
                 if cnt % 25 == 0:
                     print('Episode {} of {}'.format(cnt+1, num_episodes))
-                    save_path = saver.save(sess, "D:/saves9/model.ckpt")
+                    save_path = saver.save(sess, "D:/saves15/model.ckpt")
                     print("Model saved in path: %s" % save_path)
                 gr.run()
                 #OutputFunctions.usepedals(throttle=0)
