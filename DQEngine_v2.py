@@ -4,13 +4,14 @@ import tensorflow as tf
 import matplotlib.pylab as plt
 import random
 import math
-import watchdog
 import InputFunctions
 import OutputFunctions
 import neuro.screengrab as screengrab
 import neuro.Controller as controller
 import os
 import time
+from neuro import watchdog
+from multiprocessing import Process, Pipe
 
 MAX_EPSILON = 0.2
 MIN_EPSILON = 0.005
@@ -136,7 +137,7 @@ class GameRunner:
         self._steps = 0
         self._reward_store = []
 
-    def run(self):
+    def run(self, conn):
         posx = InputFunctions.getpos()
         while (posx == InputFunctions.getpos()):
             state = self._env.reset(self)
@@ -177,8 +178,9 @@ class GameRunner:
             # wenn das auto von der Strecke ist, oder eine Runde geschafft hat, schleife unterbrechen
             if done:
                 if (InputFunctions.getlaps() >= 1):
-                    tot_reward += 100000
+                    tot_reward += 1
                 self._reward_store.append(tot_reward)
+                conn.send(tot_reward, self.reward_store)  # sends rewards through pipe
                 break
 
         print("Step {}, Total reward: {}, Eps: {}".format(self._steps, tot_reward, self._eps))
@@ -222,7 +224,7 @@ class GameRunner:
 
     @property
     def reward_store(self):
-        return self._reward_store
+        return self._reward_store  # cumulative rewards
 
     @property
     def max_x_store(self):
@@ -231,8 +233,14 @@ class GameRunner:
 
 if __name__ == "__main__":
     # env = gym.make(env_name)
-    watchdog.App()  # run watchdog
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+    # lays pipe to watchdog process to send data
+    parent_conn, child_conn = Pipe()
+    gui = Process(target=watchdog.App, args=(child_conn,))
+
+    parent_conn.send(0)  # initial packet to be sent through pipe
+    gui.start()  # starts watchdog
 
     num_states = 1600  # (2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
     # num_actions = 49 #49 mögliche aktionen
@@ -247,8 +255,8 @@ if __name__ == "__main__":
         # sess = tf.Session(config=config)
         with tf.Session(config=config) as sess:
             time.sleep(5)
-            # if(os.path.exists("D:/saves/model.ckpt"
-            saver.restore(sess, "D:/saves15/model.ckpt")
+            if os.path.exists("D:/saves/model.ckpt"):
+                saver.restore(sess, "D:/saves15/model.ckpt")
             print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
@@ -260,7 +268,7 @@ if __name__ == "__main__":
                     print('Episode {} of {}'.format(cnt + 1, num_episodes))
                     save_path = saver.save(sess, "D:/saves15/model.ckpt")
                     print("Model saved in path: %s" % save_path)
-                gr.run()
+                gr.run(parent_conn)  # parent_conn = sending end of pipe
                 # OutputFunctions.usepedals(throttle=0)
                 cnt += 1
             plt.plot(gr.reward_store)

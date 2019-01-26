@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import ImageGrab as grab
 import cv2
-np.set_printoptions(threshold=np.nan)
+# np.set_printoptions(threshold=np.nan)
 
 killme = True
 ostepearlier = None

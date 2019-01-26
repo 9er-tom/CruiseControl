@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import psutil as ps
 from InputFunctions import get_car_position
+from multiprocessing import Pipe
 
 
 # Source: https://www.raspberrypi.org/forums/viewtopic.php?t=188251
@@ -11,13 +12,11 @@ class Mainframe(tk.Frame):
     # More advanced programs may have multiple frames
     # or possibly a grid of subframes
 
-    def __init__(self, master, *args, **kwargs):
-        # *args packs positional arguments into tuple args
-        # **kwargs packs keyword arguments into dict kwargs
+    def __init__(self, master, conn):
+        tk.Frame.__init__(self, master)
 
-        # initialise base class
-        tk.Frame.__init__(self, master, *args, **kwargs)
-        # in this case the * an ** operators unpack the parameters
+        # multiprocessing pipe
+        self.conn = conn
 
         # cpu usage in percent
         self.cpu_usage = tk.IntVar()
@@ -47,29 +46,40 @@ class Mainframe(tk.Frame):
         tk.Label(self, textvariable=self.track_progress).grid(row=3, column=2)
         tk.Label(self, text="%").grid(row=3, column=3)
 
-        # call Get Temp which will call itself after a delay
+        # cumulative reward
+        self.total_average_reward = tk.DoubleVar()
+        self.current_cumulative_reward = tk.DoubleVar()
+        tk.Label(self, text="Cumulative reward").grid(row=4, sticky="w")
+        tk.Label(self, text=" - ").grid(row=4, column=1)
+        tk.Label(self, textvariable=self.total_average_reward).grid(row=4, column=2)
+
         self.update_labels()
 
     def update_labels(self):
+        reward_array = self.conn.recv()[1]
+
         self.cpu_usage.set(ps.cpu_percent())
         self.used_ram.set(round(ps.virtual_memory().used / 10 ** 9, 2))
         self.max_ram.set(round(ps.virtual_memory().available / 10 ** 9, 2))
-        self.track_progress.set(round(get_car_position()*100, 4))
+
+        self.track_progress.set(round(get_car_position() * 100, 4))
+        self.total_average_reward.set(sum(reward_array) / len(reward_array))
+        self.current_cumulative_reward.set(self.conn.recv()[0])
+
         # repeat call
         self.after(self.TimerInterval, self.update_labels)
 
 
 class App(tk.Tk):
-    def __init__(self):
+    def __init__(self, conn):
         tk.Tk.__init__(self)
-
         # set the title bar text
         self.title('CruiseControl WatchDog')
         # Make sure app window is big enough to show title
         self.geometry('300x100')
 
         # create and pack a Mainframe window
-        Mainframe(self).pack()
+        Mainframe(self, conn).pack()
 
         # now start
         self.mainloop()
@@ -77,4 +87,5 @@ class App(tk.Tk):
 
 # create an App object
 # it will run itself
-# App()
+if __name__ == '__main__':
+    App()

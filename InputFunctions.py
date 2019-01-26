@@ -3,7 +3,6 @@ import sys
 import platform
 import numpy
 from sim_info import info
-import time
 
 cnt_enabled = False  # countdown
 flyingstart = 0
