@@ -6,7 +6,7 @@ from sim_info import info
 
 cnt_enabled = False  # countdown
 flyingstart = 0
-lastabpos = info.graphics.normalizedCarPosition * 1000000
+lastabpos = info.graphics.normalizedCarPosition
 lasttime = info.graphics.iCurrentTime / 1000.0
 timewaiting = 0
 
@@ -86,48 +86,46 @@ def checkOnTrack():
 
 def getdistance():
     global flyingstart
-    global myprogress
+    global lastabpos
     mycurrposition = info.graphics.normalizedCarPosition
-    if (mycurrposition - myprogress >= 0):
-        nompos = mycurrposition - myprogress
-    else:
-        nompos = 0
-    myprogress = mycurrposition
-    if (flyingstart > 0 and nompos >= 0):
-        flyingstart = 0
-
-    distance = round(nompos, 5)  # tracke jetzt nur fortschritt (info.graphics.numberOfLaps - flyingstart) +
-
-    # fehlt noch die Zeit abs(info.graphics.numberOfLaps - flyingstart-(info.graphics.iCurrentTime)) #Zeit in Milllisekunden
+    if (flyingstart != 1 and mycurrposition < 0.5):
+        flyingstart = 1
+    mycurrposition+=flyingstart
+    distance = mycurrposition - lastabpos
+    lastabpos = mycurrposition
     return distance
 
 
-def calculatereward():
+'''def calculatereward():
     global flyingstart
     global lastabpos
     global lasttime
-    nowtime = info.graphics.iCurrentTime / 1000.0
+    nowtime = info.graphics.iCurrentTime/1000.0
     reltime = nowtime - lasttime
     lasttime = nowtime
     pos = info.graphics.normalizedCarPosition
-    spd = info.physics.speedKmh
+    spd =  info.physics.speedKmh
     abpos = (flyingstart + pos) * 1000000
     relpos = abpos - lastabpos
     lastabpos = abpos
-    # print("relpos:",relpos,"\nabpos:",abpos,"\nlaspos:",lastabpos)
+    #print("relpos:",relpos,"\nabpos:",abpos,"\nlaspos:",lastabpos)
 
-    if (pos < 0.5):
+    if(pos < 0.5):
         flyingstart = 1
-    if (reltime > 0):
+    if(reltime > 0):
         reward = relpos - reltime
     else:
         reward = relpos
-    # if(spd >= 0.5):
-    # reward = relpos -
-    # else:
-    # eward = -0.5
-    # reward = reward - (info.graphics.iCurrentTime / 200000)
-    return reward
+    #if(spd >= 0.5):
+        #reward = relpos -
+    #else:
+        #eward = -0.5
+    #reward = reward - (info.graphics.iCurrentTime / 200000)
+    return reward'''
+
+
+def calculatereward():
+    return (getdistance() - 0.000000001)
 
 
 def resetflyinglap():
