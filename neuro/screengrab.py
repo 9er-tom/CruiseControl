@@ -20,7 +20,7 @@ def process_image(og_image):
     proc_screen[proc_screen >= thresh] = 255
     input_array = np.ndarray.flatten(proc_screen)
     input_array[input_array == 255] = 1
-    cv2.imshow('map cap', proc_screen)
+    # cv2.imshow('map cap', proc_screen)
     return input_array
 
 def process_imagews(og_image):

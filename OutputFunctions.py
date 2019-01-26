@@ -2,17 +2,18 @@ import pyvjoy
 import pynput
 import time
 
-
 '''def steer(steering=0):  # -16384 = links  0 = mitte 16384 = rechts
     print("Steer")
     print(steering)
     steering += 16384
     j.set_axis(pyvjoy.HID_USAGE_X, steering) ok
     return steering'''
+j, k, m = None, None, None
 
 def steer(steering=0.5):  # 0 = links  0.5 = mitte 1 = rechts
-    j.set_axis(pyvjoy.HID_USAGE_X, int(steering*32768))
+    j.set_axis(pyvjoy.HID_USAGE_X, int(steering * 32768))
     return steering
+
 
 def shift(gear=0):  # 0 = Neutral#
     j.set_button(1, 0)
@@ -37,13 +38,13 @@ def shift(gear=0):  # 0 = Neutral#
 
 
 def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
-    if(throttle<0.0):
+    if (throttle < 0.0):
         throttle = 0.0
     else:
         brake = 0.0
-    j.set_axis(pyvjoy.HID_USAGE_Y, int(throttle*32768))
-    j.set_axis(pyvjoy.HID_USAGE_RX, int(brake*32768))
-    j.set_axis(pyvjoy.HID_USAGE_RY, int(clutch*32768))
+    j.set_axis(pyvjoy.HID_USAGE_Y, int(throttle * 32768))
+    j.set_axis(pyvjoy.HID_USAGE_RX, int(brake * 32768))
+    j.set_axis(pyvjoy.HID_USAGE_RY, int(clutch * 32768))
     return 0
 
 
@@ -99,7 +100,7 @@ def reset():
     return 0
 
 
-def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'): #teilweise noch nach altem prinzip
+def exitbox(track='ks_zandvoort', car='ks_bmw_m235i_racing'):  # teilweise noch nach altem prinzip
     if track == 'ks_zandvoort':
         if car == 'ks_bmw_m235i_racing':
             c = 1
@@ -170,22 +171,23 @@ def exitboxmenu():
     m.release(pynput.mouse.Button.left)
     return 0
 
+
 def momgetthecamera():
     k.press(pynput.keyboard.Key.ctrl_l)
     k.press('r')
     time.sleep(1)
     k.release('r')
 
+def init_setup():
+    global j, k, m
+    j = pyvjoy.VJoyDevice(1)
+    k = pynput.keyboard.Controller()
+    m = pynput.mouse.Controller()
 
-
-j = pyvjoy.VJoyDevice(1)
-k = pynput.keyboard.Controller()
-m = pynput.mouse.Controller()
-
-j.reset()
-j.update()
-steer(0.7)
-#time.sleep(2)
+    j.reset()
+    j.update()
+    steer(0.7)
+# time.sleep(2)
 
 
 if __name__ == '__main__':
