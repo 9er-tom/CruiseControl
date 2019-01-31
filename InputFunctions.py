@@ -31,6 +31,7 @@ myprogress = info.graphics.normalizedCarPosition
 def get_car_position():
     return info.graphics.normalizedCarPosition
 
+
 def get_info():
     position = info.graphics.normalizedCarPosition
     global flyingstart
@@ -90,7 +91,7 @@ def getdistance():
     mycurrposition = info.graphics.normalizedCarPosition
     if (flyingstart != 1 and mycurrposition < 0.5):
         flyingstart = 1
-    mycurrposition+=flyingstart
+    mycurrposition += flyingstart
     distance = mycurrposition - lastabpos
     lastabpos = mycurrposition
     return distance
