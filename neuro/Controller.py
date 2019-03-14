@@ -30,62 +30,62 @@ def hardcontrolnine(out): #0-8
         usepedals(throttle=0)
     elif(out==6):
         steer(0.3)
-        usepedals(brake=0.5)
+        usepedals(brake=0.7)
     elif(out==7):
         steer()
-        usepedals(brake=0.5)
+        usepedals(brake=0.7)
     elif(out==8):
         steer(0.7)
-        usepedals(brake=0.5)
+        usepedals(brake=0.7)
     else:
         print("SHIIIIIIIIIIT\n\n")
 
 def hardcontrolfifteen(out):  # 0-14
     if (out == 0):
-        steer(0.4)
+        steer(0.42)
         usepedals(throttle=0.5)
     elif (out == 1):
-        steer(0.45)
+        steer(0.47)
         usepedals(throttle=0.5)
     elif (out == 2):
         steer()
         usepedals(throttle=0.5)
     elif (out == 3):
-        steer(0.55)
+        steer(0.53)
         usepedals(throttle=0.5)
     elif (out == 4):
-        steer(0.6)
+        steer(0.58)
         usepedals(throttle=0.5)
     elif (out == 5):
-        steer(0.4)
+        steer(0.42)
         usepedals(throttle=0)
     elif (out == 6):
-        steer(0.45)
+        steer(0.47)
         usepedals(throttle=0)
     elif (out == 7):
         steer()
         usepedals(throttle=0)
     elif (out == 8):
-        steer(0.55)
+        steer(0.53)
         usepedals(throttle=0)
     elif (out == 9):
-        steer(0.6)
+        steer(0.57)
         usepedals(throttle=0)
     elif (out == 10):
-        steer(0.4)
-        usepedals(brake=0.5)
+        steer(0.42)
+        usepedals(brake=0.7)
     elif (out == 11):
-        steer(0.45)
-        usepedals(brake=0.5)
+        steer(0.47)
+        usepedals(brake=0.7)
     elif (out == 12):
         steer()
-        usepedals(brake=0.5)
+        usepedals(brake=0.7)
     elif (out == 13):
-        steer(0.55)
-        usepedals(brake=0.5)
+        steer(0.53)
+        usepedals(brake=0.7)
     elif (out == 14):
-        steer(0.6)
-        usepedals(brake=0.5)
+        steer(0.57)
+        usepedals(brake=0.7)
     else:
         print("SHIIIIIIIIIIT\n\n")
 

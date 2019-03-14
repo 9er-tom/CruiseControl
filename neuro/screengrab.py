@@ -1,6 +1,9 @@
+from __future__ import division
+
 import numpy as np
 from PIL import ImageGrab as grab
 import cv2
+import InputFunctions
 np.set_printoptions(threshold=np.nan)
 
 killme = True
@@ -8,7 +11,35 @@ ostepearlier = None
 istepearlier = None
 iistepearlier = None
 iiistepearlier = None
+#otimeearlier = InputFunctions.get_game_time()
+#itimeearlier = None
+#iitimeearlier = None
+#iiitimeearlier = None
+#lap0time=0
 # def process_image(original_image):
+
+def reset():
+    global killme
+    global ostepearlier
+    global istepearlier
+    global iistepearlier
+    global iiistepearlier
+    #global otimeearlier
+    #global itimeearlier
+    #global iitimeearlier
+    #global iiitimeearlier
+    #global lap0time
+
+    killme = True
+    ostepearlier = None
+    istepearlier = None
+    iistepearlier = None
+    iiistepearlier = None
+    otimeearlier = InputFunctions.get_game_time()
+    itimeearlier = None
+    iitimeearlier = None
+    iiitimeearlier = None
+    lap0time = 0
 
 def process_image(og_image):
     thresh = 80
@@ -29,6 +60,11 @@ def process_imagews(og_image):
     global istepearlier
     global iistepearlier
     global iiistepearlier
+    #global otimeearlier
+    #global itimeearlier
+    #global iitimeearlier
+    #global iiitimeearlier
+    #global lap0time
     thresh = 80
     # proc_screen = cv2.cvtColor(og_image, cv2.COLOR_BGR2GRAY)
     # proc_screen = cv2.threshold(proc_screen, 90, 255, cv2.THRESH_BINARY)[1]
@@ -40,12 +76,25 @@ def process_imagews(og_image):
     input_array = np.array(input_array, dtype=float)
     input_array[input_array == 255.] = 1.
     #print(input_array)
+
     if iistepearlier is not None:
-        iiistepearlier = np.multiply(iistepearlier,0.5)
+        #iiitimeearlier = iitimeearlier
+        #iitimeearlier = itimeearlier
+        #itimeearlier = otimeearlier
+        #if otimeearlier>InputFunctions.get_game_time() and lap0time == 0:
+        #    lap0time = otimeearlier
+        #otimeearlier = InputFunctions.get_game_time()
+        iiistepearlier = np.multiply(iistepearlier,0.5)#(iitimeearlier/iiitimeearlier))
     if istepearlier is not None:
-        iistepearlier = np.multiply(istepearlier,0.5)
+        #if iistepearlier is None:
+        #    iitimeearlier = itimeearlier
+        #    itimeearlier = otimeearlier
+        iistepearlier = np.multiply(istepearlier,0.5)#(itimeearlier/iitimeearlier))
     if ostepearlier is not None:
-        istepearlier = np.multiply(ostepearlier,0.5)
+        #if istepearlier is None:
+        #    itimeearlier = otimeearlier
+        #    otimeearlier = InputFunctions.get_game_time()
+        istepearlier = np.multiply(ostepearlier,0.5)#(otimeearlier / itimeearlier))
         #print(istepearlier)
     ostepearlier = np.copy(input_array)
     #input_array = np.add(ostepearlier,istepearlier,iistepearlier)
@@ -83,8 +132,8 @@ def grab_screen():
         screen = grab.grab(bbox=(70, 400, 230, 520))  # AC 800x600, upper left corner of screen
         # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
         # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
-        #retval = process_imagews(screen)
-        retval = process_image(screen)
+        retval = process_imagews(screen)
+        #retval = process_image(screen)
         return retval
 
 

@@ -37,7 +37,7 @@ def shift(gear=0):  # 0 = Neutral#
 
 
 def usepedals(clutch=0.0, brake=0.0, throttle=0.0):
-    if(throttle<0.0):
+    if(brake>0.0):
         throttle = 0.0
     else:
         brake = 0.0
@@ -189,6 +189,28 @@ steer(0.7)
 
 
 if __name__ == '__main__':
-    time.sleep(2)
-    kill()
-    j.reset()
+    while(True):
+        x = 0.0
+        while x < 1:
+            time.sleep(0.1)
+            usepedals(x,0.0,0.0)
+            x+=0.02
+            print("clutch")
+        x = 0.0
+        while x < 1:
+            time.sleep(0.1)
+            usepedals(0.0,x,0.0)
+            x+=0.02
+            print("brake")
+        x = 0.0
+        while x < 1:
+            time.sleep(0.1)
+            usepedals(0.0,0.0,x)
+            x+=0.02
+            print("gas")
+        x = 0.0
+        while x < 1:
+            time.sleep(0.1)
+            steer(x)
+            x+=0.02
+            print("steer")
