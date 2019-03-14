@@ -39,10 +39,10 @@ class Model:
         #fc1 = tf.layers.conv2d()
         #fc2 = tf.layers
         # 2 vollverknüpfte hl 800n
-        fc1 = tf.layers.dense(self._states, 800, activation=tf.nn.relu)
+        fc1 = tf.layers.dense(self._states, 1200, activation=tf.nn.relu)
         fc2 = tf.layers.dense(fc1, 800, activation=tf.nn.relu)
-        #fc3 = tf.layers.dense(fc2, 400, activation=tf.nn.relu)
-        self._logits = tf.layers.dense(fc2, self._num_actions)
+        fc3 = tf.layers.dense(fc2, 400, activation=tf.nn.relu)
+        self._logits = tf.layers.dense(fc3, self._num_actions)
         loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
         self._optimizer = tf.train.AdamOptimizer().minimize(loss)
         self._var_init = tf.global_variables_initializer()

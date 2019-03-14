@@ -1,14 +1,15 @@
+from __future__ import division
+
 import os
 import sys
 import platform
 import numpy
 from sim_info import info
-import time
 
 cnt_enabled = False  # countdown
 flyingstart = 0
-lastabpos = info.graphics.normalizedCarPosition * 1000000
-lasttime = info.graphics.iCurrentTime / 1000.0
+lastabpos = info.graphics.normalizedCarPosition
+lasttime = info.graphics.iCurrentTime
 timewaiting = 0
 
 if platform.architecture()[0] == "64bit":
@@ -32,6 +33,9 @@ myprogress = info.graphics.normalizedCarPosition
 def get_car_position():
     return info.graphics.normalizedCarPosition
 
+def get_game_time():
+    return info.graphics.iCurrentTime
+
 def get_info():
     position = info.graphics.normalizedCarPosition
     global flyingstart
@@ -41,7 +45,7 @@ def get_info():
     wload = info.physics.wheelLoad
     return numpy.array([  # info.physics.gear,
         # info.physics.rpms,
-        round(info.physics.speedKmh) / 250],  # Topspeed 250
+        info.physics.speedKmh],  # Topspeed 250
         # info.physics.wheelSlip,
         # wload[0], wload[1], wload[2], wload[3]],
         # info.physics.tyreCoreTemperature,
@@ -55,11 +59,14 @@ def get_info():
         # info.graphics.numberOfLaps - flyingstart,
         # info.static.carModel,
         # info.static.track],
-        dtype=object)
+        dtype=float)
 
+def get_speed():
+    return info.physics.speedKmh
 
 def checkOnTrack():
     global timewaiting
+    printcurrtime()
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
     # rightnow =  time.time()
@@ -71,6 +78,7 @@ def checkOnTrack():
             and numpy.sum(info.physics.carDamage) <= 0.05
             and info.graphics.isInPit <= 0
             and info.graphics.completedLaps < 1
+            and info.physics.speedKmh > 0.01
             )  # and rightnow - timewaiting <= 5)
 
     # onTrack = 1  # assuming car is on track and trying to disprove that
@@ -87,48 +95,52 @@ def checkOnTrack():
 
 def getdistance():
     global flyingstart
-    global myprogress
+    global lastabpos
     mycurrposition = info.graphics.normalizedCarPosition
-    if (mycurrposition - myprogress >= 0):
-        nompos = mycurrposition - myprogress
-    else:
-        nompos = 0
-    myprogress = mycurrposition
-    if (flyingstart > 0 and nompos >= 0):
-        flyingstart = 0
-
-    distance = round(nompos, 5)  # tracke jetzt nur fortschritt (info.graphics.numberOfLaps - flyingstart) +
-
-    # fehlt noch die Zeit abs(info.graphics.numberOfLaps - flyingstart-(info.graphics.iCurrentTime)) #Zeit in Milllisekunden
+    if (flyingstart != 1 and mycurrposition < 0.5):
+        flyingstart = 1
+    mycurrposition+=flyingstart
+    distance = mycurrposition - lastabpos
+    lastabpos = mycurrposition
     return distance
 
 
-def calculatereward():
+'''def calculatereward():
     global flyingstart
     global lastabpos
     global lasttime
-    nowtime = info.graphics.iCurrentTime / 1000.0
+    nowtime = info.graphics.iCurrentTime/1000.0
     reltime = nowtime - lasttime
     lasttime = nowtime
     pos = info.graphics.normalizedCarPosition
-    spd = info.physics.speedKmh
+    spd =  info.physics.speedKmh
     abpos = (flyingstart + pos) * 1000000
     relpos = abpos - lastabpos
     lastabpos = abpos
-    # print("relpos:",relpos,"\nabpos:",abpos,"\nlaspos:",lastabpos)
+    #print("relpos:",relpos,"\nabpos:",abpos,"\nlaspos:",lastabpos)
 
-    if (pos < 0.5):
+    if(pos < 0.5):
         flyingstart = 1
-    if (reltime > 0):
+    if(reltime > 0):
         reward = relpos - reltime
     else:
         reward = relpos
-    # if(spd >= 0.5):
-    # reward = relpos -
-    # else:
-    # eward = -0.5
-    # reward = reward - (info.graphics.iCurrentTime / 200000)
-    return reward
+    #if(spd >= 0.5):
+        #reward = relpos -
+    #else:
+        #eward = -0.5
+    #reward = reward - (info.graphics.iCurrentTime / 200000)
+    return reward'''
+
+
+def calculatereward():
+    #global lasttime
+    #currenttime = info.graphics.iCurrentTime
+    r = (getdistance() - 0.000000001) #/ ((currenttime - lasttime))
+    #if(currenttime < lasttime):
+    #    r=(getdistance() - 0.000000001) / (currenttime)
+    #lasttime = currenttime
+    return r
 
 
 def resetflyinglap():
@@ -144,17 +156,13 @@ def getpos():
 def getlaps():
     return info.graphics.completedLaps
 
+def getbestlap():
+    return info.graphics.iBestTime
+
+def printcurrtime():
+    print(info.graphics.iCurrentTime,"    ",info.graphics.currentTime)
+
 
 if __name__ == '__main__':
-
-    if cnt_enabled:
-        # 5 sec countdown
-        '''for i in list(range(5))[::-1]:
-            print(i + 1)
-            time.sleep(1)'''
-    totalreward = 0
-    while (getlaps() < 1):
-        reward = calculatereward()
-        print(reward)
-        totalreward += reward
-    print("Total Reward: ", totalreward)
+    while True:
+        print(info.graphics.iCurrentTime)
