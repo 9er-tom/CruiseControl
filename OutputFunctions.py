@@ -191,26 +191,30 @@ steer(0.7)
 if __name__ == '__main__':
     while(True):
         x = 0.0
+        j.reset()
         while x < 1:
-            time.sleep(0.1)
+            time.sleep(0.03)
             usepedals(x,0.0,0.0)
             x+=0.02
             print("clutch")
         x = 0.0
+        j.reset()
         while x < 1:
-            time.sleep(0.1)
+            time.sleep(0.03)
             usepedals(0.0,x,0.0)
             x+=0.02
             print("brake")
         x = 0.0
+        j.reset()
         while x < 1:
-            time.sleep(0.1)
+            time.sleep(0.03)
             usepedals(0.0,0.0,x)
             x+=0.02
             print("gas")
         x = 0.0
+        j.reset()
         while x < 1:
-            time.sleep(0.1)
+            time.sleep(0.03)
             steer(x)
             x+=0.02
             print("steer")

@@ -11,11 +11,11 @@ import neuro.Controller as controller
 import os
 import time
 
-MAX_EPSILON = 0.15
+MAX_EPSILON = 0.2
 MIN_EPSILON = 0.001
-LAMBDA = 0.0001
+LAMBDA = 0.00001
 GAMMA = 0.99
-BATCH_SIZE = 50
+BATCH_SIZE = 50000
 
 class Model:
     def __init__(self, num_states, num_actions, batch_size): #num_actions = mögliche Aktionen  num_states = anzahl der Inputs
@@ -113,11 +113,16 @@ class Interpreter:
         #next_state = np.append(inputs, screen)
 
         #print(next_state)
+        reward = InputFunctions.calculatereward()
         done = False;
         if(not InputFunctions.checkOnTrack()):
             done = True
+            if(InputFunctions.getlaps()>1):
+                reward+=1000
+                print("YOU DID IT")
+            else:
+                reward-=100
 
-        reward = InputFunctions.calculatereward()
         info = 0 #möglicher Slot für AI Info
         return next_state, reward, done, info
 
@@ -251,12 +256,12 @@ if __name__ == "__main__":
         with tf.Session(config=config) as sess:
             time.sleep(5)
             #if(os.path.exists("D:/saves/model.ckpt"
-            #saver.restore(sess, "D:/saves15/model.ckpt")
-            #print("Model restored.")
+            saver.restore(sess, "D:/saves15/model.ckpt")
+            print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
                             LAMBDA)
-            num_episodes = 16000 # wat?
+            num_episodes = 10000000 # wat?
             cnt = 0
             while cnt < num_episodes: #Fehler bei 71... ram?
                 if cnt % 25 == 0:
