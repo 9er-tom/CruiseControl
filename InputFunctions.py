@@ -66,7 +66,7 @@ def get_speed():
 
 def checkOnTrack():
     global timewaiting
-    printcurrtime()
+    #printcurrtime()
     """checks if car is on track by evaluating damage and dirt levels of tyre\n
             returns true if car is on track"""
     # rightnow =  time.time()
@@ -78,7 +78,7 @@ def checkOnTrack():
             and numpy.sum(info.physics.carDamage) <= 0.05
             and info.graphics.isInPit <= 0
             and info.graphics.completedLaps < 1
-            and info.physics.speedKmh > 0.01
+            and info.physics.speedKmh > 4
             )  # and rightnow - timewaiting <= 5)
 
     # onTrack = 1  # assuming car is on track and trying to disprove that
@@ -94,6 +94,16 @@ def checkOnTrack():
 
 
 def getdistance():
+    #global flyingstart
+    global lastabpos
+    mycurrposition = info.graphics.distanceTraveled
+    distance = mycurrposition - lastabpos
+    #print("CurrentPos: ",mycurrposition)
+    #print("LastPos: ",lastabpos)
+    lastabpos = mycurrposition
+    return distance
+'''
+def getdistance():
     global flyingstart
     global lastabpos
     mycurrposition = info.graphics.normalizedCarPosition
@@ -101,11 +111,13 @@ def getdistance():
         flyingstart = 1
     mycurrposition+=flyingstart
     distance = mycurrposition - lastabpos
+    print("CurrentPos: ",mycurrposition)
+    print("LastPos: ",lastabpos)
     lastabpos = mycurrposition
     return distance
 
 
-'''def calculatereward():
+def calculatereward():
     global flyingstart
     global lastabpos
     global lasttime
@@ -130,21 +142,42 @@ def getdistance():
     #else:
         #eward = -0.5
     #reward = reward - (info.graphics.iCurrentTime / 200000)
-    return reward'''
+    return reward
 
 
 def calculatereward():
     #global lasttime
     #currenttime = info.graphics.iCurrentTime
-    r = (getdistance() - 0.000000001) #/ ((currenttime - lasttime))
+    r = (((getdistance()*get_speed()) - 0.00000001)) * 10000.0 #/ ((currenttime - lasttime))
+    #print("Reward: ",r)
+    print("Distance:",getdistance())
+    print("Speed",get_speed())
+    print("Distance*Speed",getdistance()*get_speed())
+    print("Reward:",r)
+    #if(currenttime < lasttime):
+    #    r=(getdistance() - 0.000000001) / (currenttime)
+    #lasttime = currenttime
+    return r
+'''
+
+def calculatereward():
+    #global lasttime
+    #currenttime = info.graphics.iCurrentTime
+    r = getdistance()*(get_speed()/15)#/ ((currenttime - lasttime))
+    #print("Reward: ",r)
+    print("Reward:",r)
     #if(currenttime < lasttime):
     #    r=(getdistance() - 0.000000001) / (currenttime)
     #lasttime = currenttime
     return r
 
+#def calculatereward():
+#    return (get_speed()-4)
 
 def resetflyinglap():
     global flyingstart
+    global lastabpos
+    lastabpos = info.graphics.normalizedCarPosition
     flyingstart = 0
     return 0
 

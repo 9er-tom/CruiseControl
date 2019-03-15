@@ -11,8 +11,8 @@ import neuro.Controller as controller
 import os
 import time
 
-MAX_EPSILON = 0.01
-MIN_EPSILON = 0.05
+MAX_EPSILON = 0.15
+MIN_EPSILON = 0.001
 LAMBDA = 0.0001
 GAMMA = 0.99
 BATCH_SIZE = 50
@@ -114,7 +114,7 @@ class Interpreter:
 
         #print(next_state)
         done = False;
-        if(not InputFunctions.checkOnTrack() or InputFunctions.getdistance() >= 2):
+        if(not InputFunctions.checkOnTrack()):
             done = True
 
         reward = InputFunctions.calculatereward()
@@ -189,10 +189,12 @@ class GameRunner:
           #  exit(0)
 
     def _choose_action(self, state):
-        if random.random() < self._eps:
-            return random.randint(0, self._model.num_actions - 1)
+        if InputFunctions.get_speed() <= self._eps*1000:
+            if random.random() < self._eps:
+                return random.randint(0, self._model.num_actions - 1)
         else:
-            return np.argmax(self._model.predict_one(state, self._sess))
+            print("Skipped epsilon")
+        return np.argmax(self._model.predict_one(state, self._sess))
 
     def _replay(self):
         batch = self._memory.sample(self._model.batch_size)
@@ -250,7 +252,7 @@ if __name__ == "__main__":
             time.sleep(5)
             #if(os.path.exists("D:/saves/model.ckpt"
             #saver.restore(sess, "D:/saves15/model.ckpt")
-            print("Model restored.")
+            #print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
                             LAMBDA)

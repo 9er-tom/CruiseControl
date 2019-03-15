@@ -51,7 +51,7 @@ def process_image(og_image):
     proc_screen[proc_screen >= thresh] = 255
     input_array = np.ndarray.flatten(proc_screen)
     input_array[input_array == 255] = 1
-    cv2.imshow('map cap', proc_screen)
+    #cv2.imshow('map cap', proc_screen)
     return input_array
 
 def process_imagews(og_image):
@@ -132,7 +132,7 @@ def grab_screen():
         screen = grab.grab(bbox=(70, 400, 230, 520))  # AC 800x600, upper left corner of screen
         # screen = np.array(grab.grab(bbox=(700, 450, 900, 750)))
         # screen = np.array(grab.grab(bbox=(300, 480, 500, 780)))
-        retval = process_imagews(screen)
+        retval = process_image(screen)
         #retval = process_image(screen)
         return retval
 
