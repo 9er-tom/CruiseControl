@@ -74,8 +74,8 @@ def checkOnTrack():
     #    timewaiting = rightnow
     # print(timewaiting)
     return (info.physics.numberOfTyresOut <= 0
-            and numpy.sum(info.physics.tyreDirtyLevel) <= 0.05
-            and numpy.sum(info.physics.carDamage) <= 0.05
+            and numpy.sum(info.physics.tyreDirtyLevel) <= 0.0001
+            and numpy.sum(info.physics.carDamage) <= 0.000001
             and info.graphics.isInPit <= 0
             and info.graphics.completedLaps < 1
             and info.physics.speedKmh > 4
@@ -163,7 +163,9 @@ def calculatereward():
 def calculatereward():
     #global lasttime
     #currenttime = info.graphics.iCurrentTime
-    r = getdistance()*(get_speed()/15)#/ ((currenttime - lasttime))
+    g = getdistance()
+    s = get_speed()
+    r = (g + 1.0 * (s / 15.0)) - 1.5#/ ((currenttime - lasttime))
     #print("Reward: ",r)
     print("Reward:",r)
     #if(currenttime < lasttime):
@@ -176,9 +178,12 @@ def calculatereward():
 
 def resetflyinglap():
     global flyingstart
-    global lastabpos
-    lastabpos = info.graphics.normalizedCarPosition
     flyingstart = 0
+    return 0
+
+def resetlastabpos():
+    global lastabpos
+    lastabpos = info.graphics.distanceTraveled
     return 0
 
 

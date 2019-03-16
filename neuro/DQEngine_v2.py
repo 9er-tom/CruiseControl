@@ -13,7 +13,7 @@ import time
 
 MAX_EPSILON = 0.2
 MIN_EPSILON = 0.001
-LAMBDA = 0.00001
+LAMBDA = 0.0001
 GAMMA = 0.99
 BATCH_SIZE = 50000
 
@@ -39,10 +39,10 @@ class Model:
         #fc1 = tf.layers.conv2d()
         #fc2 = tf.layers
         # 2 vollverknüpfte hl 800n
-        fc1 = tf.layers.dense(self._states, 1200, activation=tf.nn.relu)
+        fc1 = tf.layers.dense(self._states, 800, activation=tf.nn.relu)
         fc2 = tf.layers.dense(fc1, 800, activation=tf.nn.relu)
-        fc3 = tf.layers.dense(fc2, 400, activation=tf.nn.relu)
-        self._logits = tf.layers.dense(fc3, self._num_actions)
+        #fc3 = tf.layers.dense(fc2, 400, activation=tf.nn.relu)
+        self._logits = tf.layers.dense(fc2, self._num_actions)
         loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
         self._optimizer = tf.train.AdamOptimizer().minimize(loss)
         self._var_init = tf.global_variables_initializer()
@@ -117,11 +117,11 @@ class Interpreter:
         done = False;
         if(not InputFunctions.checkOnTrack()):
             done = True
-            if(InputFunctions.getlaps()>1):
+            if(InputFunctions.getlaps()>0):
                 reward+=1000
                 print("YOU DID IT")
-            else:
-                reward-=100
+            #else:
+                #reward-=100
 
         info = 0 #möglicher Slot für AI Info
         return next_state, reward, done, info
@@ -149,6 +149,7 @@ class GameRunner:
             OutputFunctions.usepedals(throttle=1)
             time.sleep(0.4)
             OutputFunctions.usepedals(brake=1)
+        InputFunctions.resetlastabpos()
         tot_reward = 0
         #max_x = -100
         while True:
@@ -256,7 +257,7 @@ if __name__ == "__main__":
         with tf.Session(config=config) as sess:
             time.sleep(5)
             #if(os.path.exists("D:/saves/model.ckpt"
-            saver.restore(sess, "D:/saves15/model.ckpt")
+            #saver.restore(sess, "D:/saves15/model.ckpt")
             print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
