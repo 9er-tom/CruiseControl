@@ -15,7 +15,7 @@ MAX_EPSILON = 0.2
 MIN_EPSILON = 0.001
 LAMBDA = 0.0001
 GAMMA = 0.99
-BATCH_SIZE = 50000
+BATCH_SIZE = 250
 
 class Model:
     def __init__(self, num_states, num_actions, batch_size): #num_actions = mögliche Aktionen  num_states = anzahl der Inputs
@@ -195,7 +195,8 @@ class GameRunner:
           #  exit(0)
 
     def _choose_action(self, state):
-        if InputFunctions.get_speed() <= self._eps*1000:
+        epsspeed=InputFunctions.get_speed()
+        if  epsspeed <= self._eps*1000 and epsspeed < 50:
             if random.random() < self._eps:
                 return random.randint(0, self._model.num_actions - 1)
         else:

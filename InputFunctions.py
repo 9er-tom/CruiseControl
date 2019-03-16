@@ -167,7 +167,9 @@ def calculatereward():
     s = get_speed()
     r = (g + 1.0 * (s / 15.0)) - 1.5#/ ((currenttime - lasttime))
     #print("Reward: ",r)
-    print("Reward:",r)
+    print("Speed:\t",s)
+    print("Distance:\t",g)
+    print("Reward:\t",r)
     #if(currenttime < lasttime):
     #    r=(getdistance() - 0.000000001) / (currenttime)
     #lasttime = currenttime
