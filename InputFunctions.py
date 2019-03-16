@@ -78,7 +78,7 @@ def checkOnTrack():
             and numpy.sum(info.physics.carDamage) <= 0.000001
             and info.graphics.isInPit <= 0
             and info.graphics.completedLaps < 1
-            and info.physics.speedKmh > 4
+            and info.physics.speedKmh > 15
             )  # and rightnow - timewaiting <= 5)
 
     # onTrack = 1  # assuming car is on track and trying to disprove that
@@ -205,4 +205,4 @@ def printcurrtime():
 
 if __name__ == '__main__':
     while True:
-        print(info.graphics.iCurrentTime)
+        print(getlaps())

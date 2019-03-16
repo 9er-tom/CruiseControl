@@ -11,8 +11,8 @@ import neuro.Controller as controller
 import os
 import time
 
-MAX_EPSILON = 0.2
-MIN_EPSILON = 0.001
+MAX_EPSILON = 0.9
+MIN_EPSILON = 0.005
 LAMBDA = 0.0001
 GAMMA = 0.99
 BATCH_SIZE = 250
@@ -196,7 +196,7 @@ class GameRunner:
 
     def _choose_action(self, state):
         epsspeed=InputFunctions.get_speed()
-        if  epsspeed <= self._eps*1000 and epsspeed < 50:
+        if  epsspeed <= self._eps*1000 and epsspeed < 50.0:
             if random.random() < self._eps:
                 return random.randint(0, self._model.num_actions - 1)
         else:
@@ -258,7 +258,7 @@ if __name__ == "__main__":
         with tf.Session(config=config) as sess:
             time.sleep(5)
             #if(os.path.exists("D:/saves/model.ckpt"
-            #saver.restore(sess, "D:/saves15/model.ckpt")
+            saver.restore(sess, "D:/saves15/model.ckpt")
             print("Model restored.")
             print(sess.run(model.var_init))
             gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
@@ -270,7 +270,7 @@ if __name__ == "__main__":
                     print('Episode {} of {}'.format(cnt+1, num_episodes))
                     save_path = saver.save(sess, "D:/saves15/model.ckpt")
                     print("Model saved in path: %s" % save_path)
-                if InputFunctions.getbestlap() <= 150000 and InputFunctions.getbestlap() > 0:
+                if InputFunctions.getbestlap() <= 240000 and InputFunctions.getbestlap() > 0:
                     print("Laptime reached",InputFunctions.getbestlap())
                     break
                 gr.run()
