@@ -24,7 +24,7 @@ class Model:
         print("States", num_states)
         self._batch_size = batch_size
         # define the placeholders
-        self._states = None
+        self.inputlayer = None
         self._actions = None
         # the output operations
         self._logits = None
@@ -34,28 +34,27 @@ class Model:
         self._define_model()
 
     def _define_model(self):
-        self._states = tf.placeholder(shape=[None, self._num_states], dtype=tf.float32)
-        self._q_s_a = tf.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
-        #fc1 = tf.layers.conv2d()
-        #fc2 = tf.layers
+        self.inputlayer = tf.placeholder(shape=[None, self._num_states], dtype=tf.float32)
+        self.outputlayer = tf.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
+        #layer1 = tf.layers.conv2d()
+        #layer2 = tf.layers
         # 2 vollverknüpfte hl 800n
-        fc1 = tf.layers.dense(self._states, 800, activation=tf.nn.relu)
-        fc2 = tf.layers.dense(fc1, 800, activation=tf.nn.relu)
-        #fc3 = tf.layers.dense(fc2, 400, activation=tf.nn.relu)
-        self._logits = tf.layers.dense(fc2, self._num_actions)
-        loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
+        layer1 = tf.layers.dense(self.inputlayer, 800, activation=tf.nn.relu)
+        layer2 = tf.layers.dense(layer1, 800, activation=tf.nn.relu)
+        #fc3 = tf.layers.dense(layer2, 400, activation=tf.nn.relu)
+        self._logits = tf.layers.dense(layer2, self._num_actions)
+        loss = tf.losses.mean_squared_error(self.outputlayer, self._logits)
         self._optimizer = tf.train.AdamOptimizer().minimize(loss)
         self._var_init = tf.global_variables_initializer()
 
     def predict_one(self, state, sess):
-        return sess.run(self._logits, feed_dict={self._states:
-                                                     state.reshape(1, self.num_states)})
+        return sess.run(self._logits, feed_dict={self.inputlayer: state.reshape(1, self.num_states)})
 
     def predict_batch(self, states, sess):
-        return sess.run(self._logits, feed_dict={self._states: states})
+        return sess.run(self._logits, feed_dict={self.inputlayer: states})
 
     def train_batch(self, sess, x_batch, y_batch):
-        sess.run(self._optimizer, feed_dict={self._states: x_batch, self._q_s_a: y_batch})
+        sess.run(self._optimizer, feed_dict={self.inputlayer: x_batch, self.outputlayer: y_batch})
 
     @property
     def num_states(self):
@@ -131,7 +130,7 @@ class GameRunner:
     def __init__(self, sess, model, interpreter, memory, max_eps, min_eps,
                  decay, render=True):
         self._sess = sess
-        self._env = interpreter
+        self.interpr = interpreter
         self._model = model
         self._memory = memory
         self._render = render
@@ -145,7 +144,7 @@ class GameRunner:
     def run(self):
         posx = InputFunctions.getpos()
         while(posx == InputFunctions.getpos()):
-            state = self._env.reset(self)
+            state = self.interpr.reset(self)
             OutputFunctions.usepedals(throttle=1)
             time.sleep(0.4)
             OutputFunctions.usepedals(brake=1)
@@ -153,11 +152,8 @@ class GameRunner:
         tot_reward = 0
         #max_x = -100
         while True:
-            #if self._render:
-                #self._env.render()
-
             action = self._choose_action(state)
-            next_state, reward, done, info = self._env.step(self,action)
+            next_state, reward, done, info = self.interpr.step(self, action)
             '''if next_state[0] >= 0.1:
                 reward += 10
             elif next_state[0] >= 0.25:
@@ -196,7 +192,7 @@ class GameRunner:
 
     def _choose_action(self, state):
         epsspeed=InputFunctions.get_speed()
-        if  epsspeed <= self._eps*1000 and epsspeed < 50.0:
+        if  epsspeed >= self._eps*1000 and epsspeed < 50.0:
             if random.random() < self._eps:
                 return random.randint(0, self._model.num_actions - 1)
         else:
@@ -240,12 +236,9 @@ class GameRunner:
         return self._max_x_store
 
 if __name__ == "__main__":
-    #env = gym.make(env_name)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-
-    num_states = 1601 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
-    #num_actions = 49 #49 mögliche aktionen
+    num_states = 1600 #1601 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
+    num_actions = 49 #49 mögliche aktionen
     num_actions = 15  # 15 mögliche aktionen
     #num_actions = 9  # 9 mögliche aktionen
     with tf.device("/gpu:0"):
@@ -261,16 +254,15 @@ if __name__ == "__main__":
             saver.restore(sess, "D:/saves15/model.ckpt")
             print("Model restored.")
             print(sess.run(model.var_init))
-            gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON,
-                            LAMBDA)
-            num_episodes = 10000000 # wat?
+            gr = GameRunner(sess, model, inter, mem, MAX_EPSILON, MIN_EPSILON, LAMBDA)
+            iterations = 10000000
             cnt = 0
-            while cnt < num_episodes: #Fehler bei 71... ram?
+            while cnt < iterations:
                 if cnt % 25 == 0:
-                    print('Episode {} of {}'.format(cnt+1, num_episodes))
                     save_path = saver.save(sess, "D:/saves15/model.ckpt")
+                    print('Episode {} of {}'.format(cnt + 1, iterations))
                     print("Model saved in path: %s" % save_path)
-                if InputFunctions.getbestlap() <= 240000 and InputFunctions.getbestlap() > 0:
+                if InputFunctions.getbestlap() <= 230000 and InputFunctions.getbestlap() > 0:
                     print("Laptime reached",InputFunctions.getbestlap())
                     break
                 gr.run()

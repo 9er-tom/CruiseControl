@@ -143,3 +143,4 @@ if __name__ == '__main__':
         if cv2.waitKey(25) & 0xFF == ord('q'):
             cv2.destroyAllWindows()
             break
+
