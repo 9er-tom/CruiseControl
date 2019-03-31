@@ -179,8 +179,8 @@ class GameRunner:
 
             # wenn das auto von der Strecke ist, oder eine Runde geschafft hat, schleife unterbrechen
             if done:
-                if(InputFunctions.getlaps()>=1):
-                    tot_reward+=1
+                #if(InputFunctions.getlaps()>=1):
+                #    tot_reward+=1
                 self._reward_store.append(tot_reward)
                 #if()
                 break
@@ -237,7 +237,7 @@ class GameRunner:
 
 if __name__ == "__main__":
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-    num_states = 1600 #1601 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
+    num_states = 1601 #1601 #(2**1600)*250 #sind das states, oder inputs? 1600 wegen bild, (4 reifen) Wheelloads near to useless, 1 geschwindigkeit
     num_actions = 49 #49 mögliche aktionen
     num_actions = 15  # 15 mögliche aktionen
     #num_actions = 9  # 9 mögliche aktionen
